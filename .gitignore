@@ -1,0 +1,29 @@
+# OS/Editor
+Thumbs.db
+.DS_Store
+.vscode/
+.idea/
+
+# General
+*.log
+
+# Frontend/Node (if any)
+node_modules/
+
+# PHP/Composer (if any)
+vendor/
+
+# Java/Maven
+admin-server/target/
+admin-server/.mvn/
+admin-server/mvnw*
+admin-server/mvnw.cmd
+
+# Local tooling/binaries (do not version SDKs/zips)
+admin-server/tools/
+admin-server/admin-server/data/
+
+# Build artifacts
+*.class
+*.jar
+*.war

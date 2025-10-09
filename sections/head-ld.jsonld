@@ -1,0 +1,43 @@
+{
+  "@context": "https://schema.org",
+  "@type": "HomeAndConstructionBusiness",
+  "name": "خدمات البناء والإصلاحات - Aversa",
+  "image": "https://source.unsplash.com/1200x630/?construction,home",
+  "@id": "https://example.com/aversa",
+  "url": "https://example.com/aversa",
+  "telephone": "+393331112222",
+  "priceRange": "€€",
+  "address": {
+    "@type": "PostalAddress",
+    "streetAddress": "Aversa",
+    "addressLocality": "Aversa",
+    "addressRegion": "CE",
+    "addressCountry": "IT"
+  },
+  "openingHoursSpecification": [
+    {
+      "@type": "OpeningHoursSpecification",
+      "dayOfWeek": [
+        "Monday",
+        "Tuesday",
+        "Wednesday",
+        "Thursday",
+        "Friday"
+      ],
+      "opens": "08:00",
+      "closes": "19:00"
+    },
+    {
+      "@type": "OpeningHoursSpecification",
+      "dayOfWeek": [
+        "Saturday"
+      ],
+      "opens": "09:00",
+      "closes": "14:00"
+    }
+  ],
+  "sameAs": [
+    "https://facebook.com/yourpage",
+    "https://instagram.com/yourpage"
+  ]
+}

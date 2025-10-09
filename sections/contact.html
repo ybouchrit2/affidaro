@@ -1,0 +1,307 @@
+<!-- Contact Form -->
+<section class="contact-section py-5" id="contact" aria-labelledby="contactHeading">
+  <div class="container">
+    <!-- Header Section -->
+    <div class="contact-header text-center mb-5">
+      <div class="contact-badge">
+        <i class="bi bi-calendar-check"></i>
+        <span>معاينة مجانية</span>
+      </div>
+      <h2 id="contactHeading" class="contact-title">احصل على عرض سعر مجاني ومفصل</h2>
+      <p class="contact-subtitle">فريق محترف وموثوق يقدم لك خدمات البناء والتشطيبات بأعلى جودة. <strong class="text-primary">الزيارة والقياسات مجانية داخل أفيرسا</strong> — نضمن لك الرد خلال 24 ساعة.</p>
+      
+      <!-- Trust Indicators -->
+      <div class="trust-indicators">
+        <div class="trust-item">
+          <i class="bi bi-shield-check-fill"></i>
+          <span>مرخص ومؤمن</span>
+        </div>
+        <div class="trust-item">
+          <i class="bi bi-award-fill"></i>
+          <span>ضمان الجودة</span>
+        </div>
+        <div class="trust-item">
+          <i class="bi bi-star-fill"></i>
+          <span>تقييم ممتاز</span>
+        </div>
+      </div>
+      
+      <!-- Quick Stats -->
+      <div class="contact-stats">
+        <div class="stat-item">
+          <div class="stat-icon">
+            <i class="bi bi-clock"></i>
+          </div>
+          <div class="stat-content">
+            <span class="stat-number">24</span>
+            <span class="stat-label">ساعة رد</span>
+          </div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-icon">
+            <i class="bi bi-geo-alt"></i>
+          </div>
+          <div class="stat-content">
+            <span class="stat-number">مجاني</span>
+            <span class="stat-label">زيارة وقياس</span>
+          </div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-icon">
+            <i class="bi bi-file-text"></i>
+          </div>
+          <div class="stat-content">
+            <span class="stat-number">مكتوب</span>
+            <span class="stat-label">عرض مفصل</span>
+          </div>
+        </div>
+        <!-- Visits Counter -->
+        <div class="stat-item">
+          <div class="stat-icon">
+            <i class="bi bi-eye"></i>
+          </div>
+          <div class="stat-content">
+            <span id="visitsTotal" class="stat-number">—</span>
+            <span class="stat-label">عدد الزيارات</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Form Section -->
+    <div class="row justify-content-center">
+      <div class="col-lg-8">
+        <div class="contact-form-wrapper">
+          <form id="contactForm" class="contact-form" data-aos="zoom-in" novalidate>
+            <div class="form-grid">
+              <div class="form-group">
+                <label class="form-label">
+                  <i class="bi bi-person"></i>
+                  الاسم الكامل
+                </label>
+                <input type="text" id="name" name="name" class="form-control" required aria-required="true" placeholder="أدخل اسمك الكامل">
+                <div class="form-feedback"></div>
+              </div>
+              
+              <div class="form-group">
+                <label class="form-label">
+                  <i class="bi bi-envelope"></i>
+                  البريد الإلكتروني
+                </label>
+                <input type="email" id="email" name="email" class="form-control" required aria-required="true" placeholder="name@example.com">
+                <div class="form-feedback"></div>
+              </div>
+              
+              <div class="form-group">
+                <label class="form-label">
+                  <i class="bi bi-telephone"></i>
+                  رقم الهاتف
+                </label>
+      <input type="tel" id="phone" name="phone" class="form-control" pattern="^[0-9+()\\s-]{6,}$" title="رقم هاتف مكوّن من 6 رموز على الأقل (أرقام، مسافات، +، -، أقواس)" inputmode="tel" required aria-required="true" placeholder="+39 333 111 2222">
+                <div class="form-feedback"></div>
+              </div>
+              
+              <div class="form-group">
+                <label class="form-label">
+                  <i class="bi bi-tools"></i>
+                  اختر الخدمة
+                </label>
+                <select id="service" name="service" class="form-select" required aria-required="true">
+                  <option value="">— اختر الخدمة —</option>
+                  <option value="tiles">تركيب الزليج</option>
+                  <option value="painting">الدهانات</option>
+                  <option value="electrical">الكهرباء</option>
+                  <option value="repairs">إصلاحات عامة</option>
+                  <option value="kitchen">مطابخ</option>
+                  <option value="bathroom">حمامات</option>
+                  <option value="other">خدمة أخرى</option>
+                </select>
+                <div class="form-feedback"></div>
+              </div>
+
+              <!-- Guided choices -->
+              <div class="form-group">
+                <label class="form-label">
+                  <i class="bi bi-geo"></i>
+                  موقع العمل (المدينة/الحي)
+                </label>
+                <input type="text" id="location" name="location" class="form-control" placeholder="مثال: أفيرسا – حي المركز">
+                <div class="form-feedback"></div>
+              </div>
+
+              <div class="form-group">
+                <label class="form-label">
+                  <i class="bi bi-building"></i>
+                  نوع العقار
+                </label>
+                <select id="propertyType" name="propertyType" class="form-select">
+                  <option value="">— اختياري —</option>
+                  <option value="apartment">شقة</option>
+                  <option value="villa">فيلا/منزل</option>
+                  <option value="shop">محل تجاري</option>
+                  <option value="office">مكتب</option>
+                </select>
+                <div class="form-feedback"></div>
+              </div>
+
+              <div class="form-group">
+                <label class="form-label">
+                  <i class="bi bi-exclamation-triangle"></i>
+                  درجة الأولوية
+                </label>
+                <select id="priority" name="priority" class="form-select">
+                  <option value="">— اختياري —</option>
+                  <option value="normal">عادي</option>
+                  <option value="week">خلال أسبوع</option>
+                  <option value="urgent">عاجل</option>
+                </select>
+                <div class="form-feedback"></div>
+              </div>
+
+              <div class="form-group">
+                <label class="form-label">
+                  <i class="bi bi-cash-coin"></i>
+                  الميزانية التقريبية
+                </label>
+                <select id="budget" name="budget" class="form-select">
+                  <option value="">— اختياري —</option>
+                  <option value="lt1k">أقل من 1000€</option>
+                  <option value="1k-3k">1000€ – 3000€</option>
+                  <option value="3k-7k">3000€ – 7000€</option>
+                  <option value="gt7k">أكثر من 7000€</option>
+                </select>
+                <div class="form-feedback"></div>
+              </div>
+
+              <div class="form-group">
+                <label class="form-label">
+                  <i class="bi bi-clock"></i>
+                  وقت التواصل المفضل
+                </label>
+                <select id="contactTime" name="contactTime" class="form-select">
+                  <option value="">— اختياري —</option>
+                  <option value="morning">صباح</option>
+                  <option value="evening">مساء</option>
+                  <option value="any">أي وقت</option>
+                </select>
+                <div class="form-feedback"></div>
+              </div>
+              
+              <div class="form-group full-width">
+                <label class="form-label">
+                  <i class="bi bi-chat-text"></i>
+                  تفاصيل إضافية
+                </label>
+                <textarea id="details" name="details" class="form-control" rows="4" placeholder="اكتب ما تحتاجه بالتفصيل... (اختياري)"></textarea>
+                <div class="form-feedback"></div>
+              </div>
+            </div>
+
+            <!-- Honeypot -->
+            <div style="display:none;" aria-hidden="true">
+              <label>مربع فارغ (لا تملأه)</label>
+              <input type="text" name="website" id="website" />
+            </div>
+
+            <!-- Privacy Notice -->
+            <div class="privacy-notice">
+              <i class="bi bi-shield-check"></i>
+              <span>نحترم خصوصيتك تماماً. بياناتك آمنة ولن نشاركها مع أي طرف ثالث. نستخدمها فقط للتواصل معك وتقديم عرض السعر المناسب. <a href="#" data-bs-toggle="modal" data-bs-target="#privacyModal">اقرأ سياسة الخصوصية</a></span>
+            </div>
+
+            <!-- Submit Button -->
+            <button type="submit" class="btn-submit">
+              <span class="btn-text">احصل على عرضك المجاني الآن</span>
+              <span class="btn-icon">
+                <i class="bi bi-arrow-left"></i>
+              </span>
+            </button>
+            
+            <!-- Success Message -->
+            <div id="formMsg" class="form-message" style="display:none;" role="status" aria-live="polite"></div>
+
+            <!-- Guarantee Section -->
+            <div class="guarantee-section">
+              <div class="guarantee-header">
+                <i class="bi bi-patch-check-fill"></i>
+                <strong>ضماناتنا لك:</strong>
+              </div>
+              <div class="guarantee-grid">
+                <div class="guarantee-item">
+                  <i class="bi bi-clock-history"></i>
+                  <span>رد خلال 24 ساعة</span>
+                </div>
+                <div class="guarantee-item">
+                  <i class="bi bi-currency-euro"></i>
+                  <span>أسعار شفافة ومنافسة</span>
+                </div>
+                <div class="guarantee-item">
+                  <i class="bi bi-tools"></i>
+                  <span>جودة عمل مضمونة</span>
+                </div>
+                <div class="guarantee-item">
+                  <i class="bi bi-x-circle"></i>
+                  <span>لا التزام بقبول العرض</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Important Notes -->
+            <div class="important-notes">
+              <div class="note-header">
+                <i class="bi bi-info-circle"></i>
+                <strong>ملاحظات مهمة:</strong>
+              </div>
+              <ul class="note-list">
+                <li>الزيارة والقياسات مجانية داخل أفيرسا فقط</li>
+                <li>العرض الذي ستحصل عليه بعد المعاينة سيكون مكتوبًا ومفصلاً</li>
+                <li>لا يوجد أي التزام عليك بقبول العرض</li>
+              </ul>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+
+    <!-- Service Cards Section -->
+    <div class="contact-info-section mt-5">
+      <div class="row g-4">
+        <div class="col-md-4">
+          <div class="info-card">
+            <div class="info-icon">
+              <i class="bi bi-geo-alt-fill"></i>
+            </div>
+            <div class="info-content">
+              <h5>منطقة التغطية</h5>
+              <p>أفيرسا والمناطق المحيطة</p>
+            </div>
+          </div>
+        </div>
+        
+        <div class="col-md-4">
+          <div class="info-card">
+            <div class="info-icon">
+              <i class="bi bi-credit-card-fill"></i>
+            </div>
+            <div class="info-content">
+              <h5>طرق الدفع</h5>
+              <p>نقبل النقود، التحويل البنكي وبطاقات الائتمان</p>
+            </div>
+          </div>
+        </div>
+        
+        <div class="col-md-4">
+          <div class="info-card">
+            <div class="info-icon">
+              <i class="bi bi-clock-fill"></i>
+            </div>
+            <div class="info-content">
+              <h5>مواعيد العمل</h5>
+              <p>من الإثنين إلى الجمعة 8:00 - 19:00</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>

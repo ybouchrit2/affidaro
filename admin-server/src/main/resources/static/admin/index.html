@@ -1,0 +1,195 @@
+<!doctype html>
+<html lang="ar" dir="rtl" data-bs-theme="light">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>لوحة الإدارة - Aversa</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.rtl.min.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
+  <!-- Cairo font to match main site -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&display=swap" rel="stylesheet">
+  <!-- Admin custom styling aligned with main site -->
+  <link rel="stylesheet" href="/admin/admin.css">
+  
+  <script>
+    // استخدم نفس الأصل للخادم كقاعدة للـ API
+    window.API_BASE = location.origin;
+  </script>
+</head>
+<body>
+  <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+    <div class="container-fluid align-items-center">
+      <a class="navbar-brand" href="#"><i class="bi bi-speedometer2 me-1"></i> Aversa Admin</a>
+      <div class="ms-auto d-flex align-items-center gap-3">
+        <a class="btn btn-outline-light btn-sm" href="http://localhost/aversa_website/index.html" target="_blank"><i class="bi bi-box-arrow-up-right"></i> العودة للموقع</a>
+        <span id="apiPill" class="pill">API: <span id="apiBaseTxt">—</span></span>
+        <small class="text-light d-flex align-items-center gap-2">آخر تحديث: <span id="lastUpdate">—</span> <span id="loadingSpinner" class="spinner-border spinner-border-sm" role="status" style="visibility:hidden"></span></small>
+      </div>
+    </div>
+  </nav>
+
+  <main class="container-xl my-4">
+    <div class="toolbar mb-4 sticky-top">
+      <div class="row g-2 align-items-end">
+        <div class="col-md-2">
+          <label class="form-label">من تاريخ</label>
+          <input type="date" id="filterFrom" class="form-control" />
+        </div>
+        <div class="col-md-2">
+          <label class="form-label">إلى تاريخ</label>
+          <input type="date" id="filterTo" class="form-control" />
+        </div>
+        <div class="col-md-3">
+          <label class="form-label">الصفحة</label>
+          <select id="filterPage" class="form-select">
+            <option value="">الكل</option>
+          </select>
+        </div>
+        <div class="col-md-3">
+          <label class="form-label">بحث</label>
+          <input type="text" id="searchText" class="form-control" placeholder="ابحث في الصفحة/المرجع" />
+        </div>
+        <div class="col-md-2 d-flex gap-2">
+          <button id="applyFilters" class="btn btn-primary w-100"><i class="bi bi-funnel"></i> تطبيق</button>
+          <button id="resetFilters" class="btn btn-outline-secondary w-100"><i class="bi bi-x-circle"></i> مسح</button>
+        </div>
+      </div>
+      <div class="d-flex align-items-center gap-3 mt-3">
+        <button id="refreshBtn" class="btn btn-outline-primary"><i class="bi bi-arrow-clockwise"></i> تحديث الآن</button>
+        <div class="form-check form-switch">
+          <input class="form-check-input" type="checkbox" id="autoRefreshSwitch">
+          <label class="form-check-label" for="autoRefreshSwitch">تحديث تلقائي كل 30ث</label>
+        </div>
+        <button id="exportVisits" class="btn btn-outline-success"><i class="bi bi-filetype-csv"></i> تصدير الزيارات CSV</button>
+        <button id="exportContacts" class="btn btn-outline-success"><i class="bi bi-filetype-csv"></i> تصدير الاتصالات CSV</button>
+      </div>
+    </div>
+
+    <div class="row g-4">
+      <div class="col-md-4">
+        <div class="card stat-card">
+          <div class="card-body">
+            <h5 class="card-title"><i class="bi bi-graph-up-arrow me-1"></i> إجمالي الزيارات</h5>
+            <div id="statTotal" class="stat fw-bold">—</div>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-4">
+        <div class="card stat-card">
+          <div class="card-body">
+            <h5 class="card-title"><i class="bi bi-calendar-day me-1"></i> زيارات اليوم</h5>
+            <div id="statToday" class="stat fw-bold">—</div>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-4">
+        <div class="card stat-card">
+          <div class="card-body">
+            <h5 class="card-title"><i class="bi bi-stopwatch me-1"></i> متوسط مدة الزيارة (ث)</h5>
+            <div id="statAvg" class="stat fw-bold">—</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="row g-4 mt-1">
+      <div class="col-md-6">
+        <div class="card">
+          <div class="card-body">
+            <h5 class="card-title"><i class="bi bi-list-ol me-1"></i> الزيارات حسب الصفحة</h5>
+            <ul id="byPage" class="list-group list-group-flush"></ul>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-6">
+        <div class="card">
+          <div class="card-body">
+            <div class="d-flex justify-content-between align-items-center">
+              <h5 class="card-title mb-0"><i class="bi bi-clock-history me-1"></i> آخر الزيارات</h5>
+              <small class="muted">إظهار 20 أولاً — استخدم الفلاتر أعلاه</small>
+            </div>
+            <div class="table-responsive sticky-table">
+              <table class="table table-sm table-striped align-middle">
+                <thead>
+                  <tr>
+                    <th>الوقت</th><th>الصفحة</th><th>المرجع</th><th>المدة (ث)</th>
+                  </tr>
+                </thead>
+                <tbody id="recentVisits"></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card mt-4">
+      <div class="card-body">
+        <div class="d-flex justify-content-between align-items-center">
+          <h5 class="card-title mb-0"><i class="bi bi-people me-1"></i> آخر طلبات الاتصال</h5>
+          <small class="muted">يشمل الحقول الإضافية: الموقع، نوع العقار، الأولوية، الميزانية، وقت التواصل</small>
+        </div>
+        <div class="table-responsive sticky-table">
+          <table class="table table-sm table-striped align-middle">
+            <thead>
+              <tr>
+                <th>الوقت</th><th>الاسم</th><th>الهاتف</th><th>البريد</th><th>الخدمة</th>
+                <th>الموقع</th><th>نوع العقار</th><th>الأولوية</th><th>الميزانية</th><th>وقت التواصل</th>
+                <th>المصدر</th><th>تفاصيل</th>
+              </tr>
+            </thead>
+            <tbody id="recentContacts"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <footer class="admin-footer">
+    <div class="container">
+      <small>لوحة إدارة Aversa — نسخة تجريبية</small>
+    </div>
+  </footer>
+
+  <!-- Visit Details Modal -->
+  <div class="modal fade" id="visitModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title"><i class="bi bi-eye me-1"></i> تفاصيل الزيارة</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <ul class="list-group" id="visitDetails"></ul>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">إغلاق</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Contact Details Modal -->
+  <div class="modal fade" id="contactModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title"><i class="bi bi-person-lines-fill me-1"></i> تفاصيل الاتصال</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <ul class="list-group" id="contactDetails"></ul>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">إغلاق</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Bootstrap JS Bundle -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="/admin/admin.js"></script>
+</body>
+</html>
