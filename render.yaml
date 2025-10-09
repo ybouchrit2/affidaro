@@ -1,0 +1,28 @@
+services:
+  - type: web
+    name: affidaro-admin
+    env: java
+    plan: starter
+    region: frankfurt
+    rootDir: admin-server
+    buildCommand: mvn -DskipTests clean package
+    startCommand: java -Dserver.port=$PORT -jar target/admin-server-0.0.1-SNAPSHOT.jar --spring.profiles.active=prod
+    autoDeploy: true
+    healthCheckPath: /
+    envVars:
+      - key: SPRING_DATASOURCE_URL
+        sync: false
+      - key: SPRING_DATASOURCE_USERNAME
+        sync: false
+      - key: SPRING_DATASOURCE_PASSWORD
+        sync: false
+      - key: SPRING_MAIL_HOST
+        sync: false
+      - key: SPRING_MAIL_USERNAME
+        sync: false
+      - key: SPRING_MAIL_PASSWORD
+        sync: false
+      - key: SPRING_MAIL_PORT
+        value: "587"
+      - key: JAVA_OPTS
+        value: "-Xms256m -Xmx512m"
