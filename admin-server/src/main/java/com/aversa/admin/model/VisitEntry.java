@@ -8,7 +8,6 @@ public class VisitEntry {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    @Column(columnDefinition = "DATETIME(6)")
     private Instant timestamp;
     private String page;
     private String referrer;

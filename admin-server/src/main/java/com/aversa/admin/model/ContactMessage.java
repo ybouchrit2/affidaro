@@ -9,7 +9,6 @@ public class ContactMessage {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(columnDefinition = "DATETIME(6)")
     private Instant timestamp;
 
     private String name;
