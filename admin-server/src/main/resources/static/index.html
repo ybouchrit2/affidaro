@@ -58,6 +58,9 @@
   <link rel="stylesheet" href="assets/css/faq-section.css">
   <link rel="stylesheet" href="assets/css/footer-section.css">
 
+  <!-- Ensure frontend uses same-origin APIs in production -->
+  <script>window.API_BASE = location.origin;</script>
+
   <!-- Structured Data -->
   <script type="application/ld+json">
   {
@@ -141,6 +144,6 @@
   <script src="https://unpkg.com/aos@2.3.4/dist/aos.js" defer></script>
 
   <!-- Project scripts -->
-  <script src="assets/js/main.js" defer></script>
+  <script src="assets/js/main.js?v=20251010a" defer></script>
 </body>
 </html>
