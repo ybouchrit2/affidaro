@@ -74,7 +74,7 @@ public class SecurityConfig {
 
     private boolean isBcryptHash(String value) {
         // Basic BCrypt hash pattern: $2a$, $2b$, or $2y$
-        return value != null && value.matches("^\$2[aby]\$[0-9]{2}\$[A-Za-z0-9./]{53}$");
+        return value != null && value.matches("^\\$2[aby]\\$[0-9]{2}\\$[A-Za-z0-9./]{53}$");
     }
 
     private boolean isIdPrefixedHash(String value) {
