@@ -12,7 +12,7 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.factory.PasswordEncoderFactories;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 import org.springframework.security.web.SecurityFilterChain;
@@ -25,7 +25,8 @@ public class SecurityConfig {
 
     @Bean
     public PasswordEncoder passwordEncoder() {
-        return new BCryptPasswordEncoder();
+        // DelegatingPasswordEncoder supports {id} format and common encoders
+        return PasswordEncoderFactories.createDelegatingPasswordEncoder();
     }
 
     @Bean
@@ -39,20 +40,23 @@ public class SecurityConfig {
         String password = StringUtils.hasText(adminPassword) ? adminPassword : "admin123";
 
         try {
+            String finalPassword = (isBcryptHash(password) || isIdPrefixedHash(password))
+                    ? password
+                    : encoder.encode(password);
+
             UserDetails admin = User
                     .withUsername(sanitizedUsername)
-                    .passwordEncoder(encoder::encode)
-                    .password(password)
+                    // Use pre-encoded or encoder output; do not double-encode
+                    .password(finalPassword)
                     .roles("ADMIN")
                     .build();
             return new InMemoryUserDetailsManager(admin);
-        } catch (IllegalArgumentException ex) {
+        } catch (RuntimeException ex) {
             // Fallback to safe defaults if provided values are invalid
             log.warn("Invalid admin credentials provided. Falling back to defaults. Cause: {}", ex.getMessage());
             UserDetails fallback = User
                     .withUsername("admin")
-                    .passwordEncoder(encoder::encode)
-                    .password("admin123")
+                    .password(encoder.encode("admin123"))
                     .roles("ADMIN")
                     .build();
             return new InMemoryUserDetailsManager(fallback);
@@ -66,6 +70,16 @@ public class SecurityConfig {
             return "admin";
         }
         return cleaned;
+    }
+
+    private boolean isBcryptHash(String value) {
+        // Basic BCrypt hash pattern: $2a$, $2b$, or $2y$
+        return value != null && value.matches("^\$2[aby]\$[0-9]{2}\$[A-Za-z0-9./]{53}$");
+    }
+
+    private boolean isIdPrefixedHash(String value) {
+        // Spring {id} format, e.g., {bcrypt}...
+        return value != null && value.startsWith("{") && value.contains("}");
     }
 
     @Bean
