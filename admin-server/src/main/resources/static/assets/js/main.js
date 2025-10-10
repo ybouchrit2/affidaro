@@ -3,7 +3,7 @@
   'use strict';
 
   // API base (قابل للتغيير لاحقاً إن لزم)
-  const API_BASE = window.API_BASE || 'http://localhost:8090';
+  const API_BASE = (typeof window.API_BASE !== 'undefined' && window.API_BASE !== null) ? window.API_BASE : '';
 
   // DOM elements cache
   const elements = {};
@@ -297,7 +297,7 @@
       msgBox.style.display='block'; msgBox.className='alert alert-info'; msgBox.textContent='جاري إرسال طلبك...';
 
       try{
-        const res = await fetch((window.API_BASE||'http://localhost:8090') + '/api/contact',{
+        const res = await fetch(API_BASE + '/api/contact',{
           method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(payload)
         });
         if(!res.ok) throw new Error('Failed');
@@ -408,7 +408,7 @@ function bindContactFormIfPresent(){
     if(submitBtn){ submitBtn.disabled = true; }
 
     try{
-      const res = await fetch((window.API_BASE||'http://localhost:8090') + '/api/contact',{
+      const res = await fetch(API_BASE + '/api/contact',{
         method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(payload)
       });
       if(!res.ok) throw new Error('Failed');
@@ -473,7 +473,7 @@ if(contactForm && contactForm.dataset.bound !== '1') {
     msgBox.style.display='block'; msgBox.className='alert alert-info'; msgBox.textContent='جاري إرسال طلبك...';
 
     try{
-      const res = await fetch((window.API_BASE||'http://localhost:8090') + '/api/contact',{
+      const res = await fetch(API_BASE + '/api/contact',{
         method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(payload)
       });
       if(!res.ok) throw new Error('Failed');
