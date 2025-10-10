@@ -2,6 +2,8 @@ package com.aversa.admin.config;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.util.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -19,6 +21,8 @@ import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 @Configuration
 public class SecurityConfig {
 
+    private static final Logger log = LoggerFactory.getLogger(SecurityConfig.class);
+
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
@@ -30,16 +34,38 @@ public class SecurityConfig {
             @Value("${admin.username:admin}") String adminUsername,
             @Value("${admin.password:admin123}") String adminPassword
     ) {
-        String username = StringUtils.hasText(adminUsername) ? adminUsername.trim() : "admin";
+        String rawUsername = StringUtils.hasText(adminUsername) ? adminUsername.trim() : "admin";
+        String sanitizedUsername = sanitizeUsername(rawUsername);
         String password = StringUtils.hasText(adminPassword) ? adminPassword : "admin123";
 
-        UserDetails admin = User
-                .withUsername(username)
-                .passwordEncoder(encoder::encode)
-                .password(password)
-                .roles("ADMIN")
-                .build();
-        return new InMemoryUserDetailsManager(admin);
+        try {
+            UserDetails admin = User
+                    .withUsername(sanitizedUsername)
+                    .passwordEncoder(encoder::encode)
+                    .password(password)
+                    .roles("ADMIN")
+                    .build();
+            return new InMemoryUserDetailsManager(admin);
+        } catch (IllegalArgumentException ex) {
+            // Fallback to safe defaults if provided values are invalid
+            log.warn("Invalid admin credentials provided. Falling back to defaults. Cause: {}", ex.getMessage());
+            UserDetails fallback = User
+                    .withUsername("admin")
+                    .passwordEncoder(encoder::encode)
+                    .password("admin123")
+                    .roles("ADMIN")
+                    .build();
+            return new InMemoryUserDetailsManager(fallback);
+        }
+    }
+
+    private String sanitizeUsername(String input) {
+        // Allow common username characters; strip anything problematic
+        String cleaned = input.replaceAll("[^A-Za-z0-9._@-]", "");
+        if (!StringUtils.hasText(cleaned)) {
+            return "admin";
+        }
+        return cleaned;
     }
 
     @Bean
