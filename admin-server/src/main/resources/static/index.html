@@ -50,7 +50,7 @@
 
   <!-- Preload Critical Resources -->
   <link rel="preload" href="assets/css/style.css" as="style">
-  <link rel="preload" href="assets/js/main.js" as="script">
+  <link rel="preload" href="assets/js/main.js?v=20251010b" as="script">
   <link rel="preload" href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&display=swap" as="style">
 
   <!-- Vendors (CDN) -->
@@ -162,5 +162,7 @@
 
   <!-- Project bootstrap: set API_BASE before loading main.js -->
   <script src="assets/js/bootstrap-20251010b.js" defer></script>
+  <!-- Main application script (static include with cache-busting) -->
+  <script src="assets/js/main.js?v=20251010b" defer></script>
   </body>
 </html>
