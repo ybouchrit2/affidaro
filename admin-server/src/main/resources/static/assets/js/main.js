@@ -505,3 +505,15 @@ if(videoModalEl) videoModalEl.addEventListener('hidden.bs.modal', function (even
   const v = document.getElementById('promoVideo');
   if(v && !v.paused) { v.pause(); v.currentTime = 0; }
 });
+
+// Enable lazy-loading for images/iframes not explicitly marked
+document.addEventListener('DOMContentLoaded', function(){
+  try {
+    document.querySelectorAll('img:not([loading])').forEach(img=>{
+      img.setAttribute('loading','lazy');
+    });
+    document.querySelectorAll('iframe:not([loading])').forEach(ifr=>{
+      ifr.setAttribute('loading','lazy');
+    });
+  } catch(e) { /* ignore */ }
+});

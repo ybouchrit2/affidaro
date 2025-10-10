@@ -1,15 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
-    <loc>https://example.com/</loc>
+    <loc>https://affidaro.com/</loc>
     <priority>1.0</priority>
   </url>
-  <url><loc>https://example.com/contact.html</loc></url>
-  <url><loc>https://example.com/sections/about.html</loc></url>
-  <url><loc>https://example.com/sections/services.html</loc></url>
-  <url><loc>https://example.com/sections/testimonials.html</loc></url>
-  <url><loc>https://example.com/sections/faq.html</loc></url>
-  <url><loc>https://example.com/sections/partners.html</loc></url>
-  <url><loc>https://example.com/sections/why-us.html</loc></url>
-  <url><loc>https://example.com/sections/cases.html</loc></url>
+  <url><loc>https://affidaro.com/#contact</loc></url>
+  <url><loc>https://affidaro.com/#about</loc></url>
+  <url><loc>https://affidaro.com/#services</loc></url>
+  <url><loc>https://affidaro.com/#testimonials</loc></url>
+  <url><loc>https://affidaro.com/#faq</loc></url>
+  <url><loc>https://affidaro.com/#partners</loc></url>
+  <url><loc>https://affidaro.com/#why-us</loc></url>
+  <url><loc>https://affidaro.com/#cases</loc></url>
 </urlset>
