@@ -1,6 +1,7 @@
 package com.aversa.admin.config;
 
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.util.StringUtils;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -29,9 +30,13 @@ public class SecurityConfig {
             @Value("${admin.username:admin}") String adminUsername,
             @Value("${admin.password:admin123}") String adminPassword
     ) {
+        String username = StringUtils.hasText(adminUsername) ? adminUsername.trim() : "admin";
+        String password = StringUtils.hasText(adminPassword) ? adminPassword : "admin123";
+
         UserDetails admin = User
-                .withUsername(adminUsername)
-                .password(encoder.encode(adminPassword))
+                .withUsername(username)
+                .passwordEncoder(encoder::encode)
+                .password(password)
                 .roles("ADMIN")
                 .build();
         return new InMemoryUserDetailsManager(admin);
