@@ -102,6 +102,8 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.GET, "/api/visits/stats").permitAll()
                         // حماية قراءات لوحة الإدارة
                         .requestMatchers("/api/contact/recent").hasRole("ADMIN")
+                        // حماية إدارة العملاء والاتفاقيات
+                        .requestMatchers("/api/clients/**", "/api/agreements/**").hasRole("ADMIN")
                         // حماية صفحات/ملفات الإدارة
                         .requestMatchers("/admin/**").hasRole("ADMIN")
                         .anyRequest().permitAll()

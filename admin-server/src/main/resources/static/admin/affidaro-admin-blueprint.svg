@@ -1,0 +1,122 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="900" viewBox="0 0 1200 900">
+  <defs>
+    <style><![CDATA[
+      .box { fill:#ffffff; stroke:#1f2937; stroke-width:2; rx:12; ry:12; }
+      .title { font: 700 18px 'Inter', sans-serif; fill:#111827; }
+      .text { font: 400 14px 'Inter', sans-serif; fill:#374151; }
+      .pill { fill:#eef2ff; stroke:#4f46e5; stroke-width:1; rx:8; ry:8; }
+      .arrow { stroke:#4b5563; stroke-width:2; fill:none; marker-end:url(#arrowHead); }
+      .groupTitle { font: 700 20px 'Inter', sans-serif; fill:#0f172a; }
+      .bg { fill:#f8fafc; }
+    ]]></style>
+    <marker id="arrowHead" viewBox="0 0 10 10" refX="10" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#4b5563"></path>
+    </marker>
+  </defs>
+
+  <!-- Background -->
+  <rect class="bg" x="0" y="0" width="1200" height="900" />
+
+  <!-- Header -->
+  <text x="40" y="50" class="groupTitle">Affidaro Admin — Blueprint</text>
+  <text x="40" y="75" class="text">هيكل الأقسام والعلاقات التشغيلية المقترحة لإدارة المشروع</text>
+
+  <!-- Dashboard -->
+  <rect class="box" x="40" y="110" width="340" height="160" />
+  <text class="title" x="60" y="140">Dashboard (لوحة القيادة)</text>
+  <text class="text" x="60" y="170">• KPIs: العملاء الجدد، متوسط الصفقة، الخدمات الأكثر طلبًا</text>
+  <text class="text" x="60" y="195">• زيارات اليوم/الأسبوع + مصادر الإحالة</text>
+  <text class="text" x="60" y="220">• المهام القادمة والإشعارات</text>
+
+  <!-- Clients / CRM -->
+  <rect class="box" x="420" y="110" width="340" height="220" />
+  <text class="title" x="440" y="140">Clients (إدارة العملاء / CRM)</text>
+  <text class="text" x="440" y="170">• تصنيفات: Lead / Active / Former / VIP</text>
+  <text class="text" x="440" y="195">• مراحل: مهتم → تواصل → عرض سعر → تفاوض → متعاقد → منجز</text>
+  <text class="text" x="440" y="220">• سجل تواصل + تكامل WhatsApp/Email</text>
+  <text class="text" x="440" y="245">• تحويل نماذج التواصل إلى عميل</text>
+
+  <!-- Projects -->
+  <rect class="box" x="800" y="110" width="340" height="220" />
+  <text class="title" x="820" y="140">Projects (المشاريع والخدمات)</text>
+  <text class="text" x="820" y="170">• ربط العميل + نوع الخدمة + الموقع</text>
+  <text class="text" x="820" y="195">• تاريخ البدء/الانتهاء + نسبة الإنجاز%</text>
+  <text class="text" x="820" y="220">• صور قبل/بعد + المسؤول</text>
+
+  <!-- Invoices & Payments -->
+  <rect class="box" x="40" y="300" width="340" height="220" />
+  <text class="title" x="60" y="330">Payments (الفواتير والمدفوعات)</text>
+  <text class="text" x="60" y="360">• فاتورة لكل عميل + حالة الدفع</text>
+  <text class="text" x="60" y="385">• طرق الدفع: نقدي/تحويل/PayPal</text>
+  <text class="text" x="60" y="410">• توليد PDF + حساب الأرباح</text>
+
+  <!-- Team -->
+  <rect class="box" x="420" y="360" width="340" height="160" />
+  <text class="title" x="440" y="390">Team (إدارة الفريق)</text>
+  <text class="text" x="440" y="420">• الفنيون/المقاولون + الاختصاص + المشاريع المنجزة</text>
+  <text class="text" x="440" y="445">• تقييمات العملاء + المواعيد المجدولة</text>
+
+  <!-- Analytics -->
+  <rect class="box" x="800" y="360" width="340" height="160" />
+  <text class="title" x="820" y="390">Analytics (الإحصائيات)</text>
+  <text class="text" x="820" y="420">• العملاء الجدد + قيمة الصفقات</text>
+  <text class="text" x="820" y="445">• أكثر الخدمات طلبًا + المدن الأكثر نشاطًا</text>
+
+  <!-- Settings -->
+  <rect class="box" x="40" y="560" width="340" height="160" />
+  <text class="title" x="60" y="590">Settings (إعدادات النظام)</text>
+  <text class="text" x="60" y="620">• اللغات + الألوان/الشعار + صلاحيات المستخدمين</text>
+  <text class="text" x="60" y="645">• النسخ الاحتياطي التلقائي (S3/Google Cloud)</text>
+
+  <!-- Notifications -->
+  <rect class="box" x="420" y="560" width="340" height="160" />
+  <text class="title" x="440" y="590">Notifications (التذكيرات والإشعارات)</text>
+  <text class="text" x="440" y="620">• مواعيد الزيارات + فواتير مستحقة + عملاء جدد</text>
+  <text class="text" x="440" y="645">• قنوات: Email / Telegram / WhatsApp</text>
+
+  <!-- Visits (Analytics Source) -->
+  <rect class="box" x="800" y="560" width="340" height="160" />
+  <text class="title" x="820" y="590">Visits (تحليلات الزيارات)</text>
+  <text class="text" x="820" y="620">• Heatmap المدن/الدول + الأجهزة</text>
+  <text class="text" x="820" y="645">• الصفحات الأكثر زيارة + مصادر الإحالة</text>
+
+  <!-- Relations / Flows -->
+  <!-- Leads/Contacts -> Clients -->
+  <path class="arrow" d="M 590 330 L 590 360" />
+  <text class="text" x="600" y="350">تحويل التواصل إلى عميل</text>
+
+  <!-- Clients -> Projects -->
+  <path class="arrow" d="M 760 220 L 800 220" />
+  <text class="text" x="770" y="205">اتفاق/خدمة</text>
+
+  <!-- Projects -> Payments -->
+  <path class="arrow" d="M 970 330 L 970 360" />
+  <path class="arrow" d="M 970 360 L 380 360" />
+  <text class="text" x="880" y="350">إنهاء المشروع → إنشاء فاتورة</text>
+
+  <!-- Team -> Projects -->
+  <path class="arrow" d="M 590 520 L 590 470" />
+  <text class="text" x="600" y="500">تعيين مسؤول المشروع</text>
+
+  <!-- Visits -> Analytics -->
+  <path class="arrow" d="M 970 560 L 970 520" />
+  <text class="text" x="980" y="540">مصدر بيانات التحليلات</text>
+
+  <!-- Settings -> All -->
+  <path class="arrow" d="M 380 640 L 420 640" />
+  <text class="text" x="300" y="635">سياسات وصلاحيات تؤثر على الكل</text>
+
+  <!-- Notifications -> Dashboard -->
+  <path class="arrow" d="M 590 560 L 590 270" />
+  <path class="arrow" d="M 590 270 L 380 270" />
+  <text class="text" x="480" y="265">تنبيهات تعرض في لوحة القيادة</text>
+
+  <!-- Legend Pills -->
+  <rect class="pill" x="40" y="750" width="210" height="40" />
+  <text class="text" x="55" y="775">تدفق العمل الأساسي</text>
+  <rect class="pill" x="260" y="750" width="260" height="40" />
+  <text class="text" x="275" y="775">تكاملات: WhatsApp / Email / Telegram</text>
+  <rect class="pill" x="530" y="750" width="240" height="40" />
+  <text class="text" x="545" y="775">تحليلات وزيارات كمصدر بيانات</text>
+</svg>

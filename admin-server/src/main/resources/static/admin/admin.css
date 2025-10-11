@@ -114,3 +114,9 @@ code {
   .stat { font-size: 1.4rem; }
   .container { padding-inline: 12px; }
 }
+#updatingText { font-weight: 600; }
+.pill { display:inline-block; padding:6px 10px; border:1px solid #ddd; border-radius:20px; background:#f8f9fa; }
+.status-badge { padding:2px 8px; border-radius:12px; font-size: 0.85rem; }
+.status-pending { background:#fff3cd; color:#8a6d3b; }
+.status-signed { background:#d1e7dd; color:#0f5132; }
+.status-cancelled { background:#f8d7da; color:#842029; }

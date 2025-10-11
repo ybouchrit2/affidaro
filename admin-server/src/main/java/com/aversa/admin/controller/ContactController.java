@@ -1,7 +1,11 @@
 package com.aversa.admin.controller;
 
 import com.aversa.admin.model.ContactMessage;
+import com.aversa.admin.model.Client;
 import com.aversa.admin.repository.ContactMessageRepository;
+import com.aversa.admin.repository.ClientRepository;
+import com.aversa.admin.repository.ServiceItemRepository;
+import com.aversa.admin.model.ServiceItem;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 
@@ -21,9 +25,13 @@ import java.util.Optional;
 public class ContactController {
 
     private final ContactMessageRepository repo;
+    private final ClientRepository clientRepo;
+    private final ServiceItemRepository serviceRepo;
 
-    public ContactController(ContactMessageRepository repo) {
+    public ContactController(ContactMessageRepository repo, ClientRepository clientRepo, ServiceItemRepository serviceRepo) {
         this.repo = repo;
+        this.clientRepo = clientRepo;
+        this.serviceRepo = serviceRepo;
     }
 
     static class ContactPayload {
@@ -31,6 +39,7 @@ public class ContactController {
         public String email;
         public String phone;
         public String service;
+        public Long serviceId;
         public String location;
         public String propertyType;
         public String priority;
@@ -52,6 +61,33 @@ public class ContactController {
                 safe(p.location), safe(p.propertyType), safe(p.priority), safe(p.budget), safe(p.contactTime),
                 safe(p.details), safe(ua), safe(ip), safe(p.source)
         );
+        // Link to existing client or create new one to satisfy Client→Lead rule
+        Client client = null;
+        String email = safe(p.email).trim();
+        String phone = safe(p.phone).replaceAll("\\s", "").trim();
+        if(!email.isEmpty()){
+            client = clientRepo.findByEmailIgnoreCase(email);
+        }
+        if(client == null && !phone.isEmpty()){
+            var list = clientRepo.findByPhoneContaining(phone);
+            if(!list.isEmpty()) client = list.get(0);
+        }
+        if(client == null){
+            client = new Client();
+            client.setName(safe(p.name));
+            client.setEmail(email);
+            client.setPhone(phone);
+            client.setSource(safe(p.source));
+            client.setStatus("interested");
+            client.setClassification("lead");
+            client.setPipelineStage("interested");
+            clientRepo.save(client);
+        }
+        m.setClient(client);
+        if (p.serviceId != null) {
+            Optional<ServiceItem> os = serviceRepo.findById(p.serviceId);
+            os.ifPresent(m::setServiceItem);
+        }
         repo.save(m);
         return Map.of("status", "ok");
     }
