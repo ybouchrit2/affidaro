@@ -9,7 +9,8 @@ import com.aversa.admin.model.ServiceItem;
 @Entity
 @Table(indexes = {
         @Index(name = "idx_contracts_client_id", columnList = "client_id"),
-        @Index(name = "idx_agreements_service_id", columnList = "service_id")
+        @Index(name = "idx_agreements_service_id", columnList = "service_id"),
+        @Index(name = "idx_agreements_created_at", columnList = "createdAt")
 })
 public class Agreement {
     @Id

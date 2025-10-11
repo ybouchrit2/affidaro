@@ -8,17 +8,27 @@ import com.aversa.admin.repository.ServiceItemRepository;
 import com.aversa.admin.repository.InteractionLogRepository;
 import com.aversa.admin.model.ServiceItem;
 import com.aversa.admin.model.InteractionLog;
+import com.aversa.admin.web.BadRequestException;
+import com.aversa.admin.web.ResourceNotFoundException;
 import org.springframework.http.MediaType;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.web.bind.annotation.*;
 
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Pattern;
+import jakarta.validation.constraints.Positive;
+import jakarta.validation.constraints.Size;
+import jakarta.validation.constraints.AssertTrue;
+
 import java.math.BigDecimal;
 import java.time.Instant;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 
 @RestController
 @RequestMapping("/api/agreements")
@@ -42,15 +52,49 @@ public class AgreementController {
         this.interactionRepo = interactionRepo;
     }
 
-    static class AgreementPayload {
+    private static final Set<String> ALLOWED_STATUS = Set.of("draft", "signed", "cancelled", "pending");
+
+    static class AgreementCreatePayload {
+        @NotNull(message = "clientId is required")
         public Long clientId;
+        @Size(max = 100, message = "service too long")
         public String service; // legacy label
         public Long serviceId; // strong relation
+        @Pattern(regexp = "^\\d+(?:[.,]\\d{1,2})?$", message = "invalid price format")
         public String price; // string to be parsed as BigDecimal
+        @Pattern(regexp = "^[A-Z]{3}$", message = "invalid currency code")
         public String currency;
+        @Pattern(regexp = "^(draft|signed|cancelled|pending)$", message = "invalid status value")
         public String status;
+        @Size(max = 2000, message = "details too long")
         public String details;
+        @Positive(message = "signedAtMs must be positive")
         public Long signedAtMs; // optional epoch millis
+
+        @AssertTrue(message = "signedAtMs requires status=\"signed\"")
+        public boolean isSignedConsistency(){
+            return signedAtMs == null || (status != null && status.equalsIgnoreCase("signed"));
+        }
+    }
+
+    static class AgreementUpdatePayload {
+        public String service; // legacy label
+        public Long serviceId; // strong relation
+        @Pattern(regexp = "^\\d+(?:[.,]\\d{1,2})?$", message = "invalid price format")
+        public String price; // string to be parsed as BigDecimal
+        @Pattern(regexp = "^[A-Z]{3}$", message = "invalid currency code")
+        public String currency;
+        @Pattern(regexp = "^(draft|signed|cancelled|pending)$", message = "invalid status value")
+        public String status;
+        @Size(max = 2000, message = "details too long")
+        public String details;
+        @Positive(message = "signedAtMs must be positive")
+        public Long signedAtMs; // optional epoch millis
+
+        @AssertTrue(message = "signedAtMs requires status=\"signed\"")
+        public boolean isSignedConsistency(){
+            return signedAtMs == null || (status != null && status.equalsIgnoreCase("signed"));
+        }
     }
 
     @GetMapping("/recent")
@@ -61,10 +105,10 @@ public class AgreementController {
     }
 
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
-    public Map<String, Object> create(@RequestBody AgreementPayload p) {
+    public Map<String, Object> create(@Valid @RequestBody AgreementCreatePayload p) {
         Optional<Client> oc = clientRepo.findById(p.clientId);
         if (oc.isEmpty()) {
-            return Map.of("status", "client_not_found");
+            throw new ResourceNotFoundException("Client not found: " + p.clientId);
         }
         Client client = oc.get();
         BigDecimal price = safeDecimal(p.price);
@@ -72,7 +116,7 @@ public class AgreementController {
         Agreement a = new Agreement(client, safe(p.service), price, safeCurrency(p.currency), safe(p.status), safe(p.details), signedAt);
         if (p.serviceId != null) {
             Optional<ServiceItem> os = serviceRepo.findById(p.serviceId);
-            if (os.isEmpty()) return Map.of("status","service_not_found");
+            if (os.isEmpty()) throw new ResourceNotFoundException("Service not found: " + p.serviceId);
             a.setServiceItem(os.get());
         }
         agreementRepo.save(a);
@@ -94,16 +138,17 @@ public class AgreementController {
     }
 
     @PutMapping(value = "/{id}", consumes = MediaType.APPLICATION_JSON_VALUE)
-    public Map<String, Object> update(@PathVariable("id") Long id, @RequestBody AgreementPayload p) {
+    public Map<String, Object> update(@PathVariable("id") Long id, @Valid @RequestBody AgreementUpdatePayload p) {
         Optional<Agreement> oa = agreementRepo.findById(id);
         if (oa.isEmpty()) {
-            return Map.of("status", "not_found");
+            throw new ResourceNotFoundException("Agreement not found: " + id);
         }
         Agreement a = oa.get();
         if (p.service != null) a.setService(p.service);
         if (p.serviceId != null){
             Optional<ServiceItem> os = serviceRepo.findById(p.serviceId);
-            os.ifPresent(a::setServiceItem);
+            if (os.isEmpty()) throw new ResourceNotFoundException("Service not found: " + p.serviceId);
+            a.setServiceItem(os.get());
         }
         if (p.price != null) a.setAgreedPrice(safeDecimal(p.price));
         if (p.currency != null) a.setCurrency(safeCurrency(p.currency));

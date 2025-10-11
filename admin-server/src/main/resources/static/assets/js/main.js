@@ -3,7 +3,7 @@
   'use strict';
 
   // API base (قابل للتغيير لاحقاً إن لزم)
-  const API_BASE = (typeof window.API_BASE !== 'undefined' && window.API_BASE !== null) ? window.API_BASE : '';
+  const API_BASE = (typeof window.API_BASE !== 'undefined' && window.API_BASE !== null) ? window.API_BASE : location.origin;
 
   // DOM elements cache
   const elements = {};

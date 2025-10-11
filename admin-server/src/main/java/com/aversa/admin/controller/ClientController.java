@@ -8,16 +8,24 @@ import com.aversa.admin.repository.ContactMessageRepository;
 import com.aversa.admin.repository.AgreementRepository;
 import com.aversa.admin.repository.InteractionLogRepository;
 import com.aversa.admin.repository.UserRepository;
+import com.aversa.admin.web.BadRequestException;
+import com.aversa.admin.web.ResourceNotFoundException;
 import org.springframework.http.MediaType;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.web.bind.annotation.*;
 
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Pattern;
+
 import java.time.Instant;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 
 @RestController
 @RequestMapping("/api/clients")
@@ -43,6 +51,9 @@ public class ClientController {
         this.userRepo = userRepo;
     }
 
+    private static final Set<String> ALLOWED_STATUS = Set.of("lead", "interested", "active", "rejected");
+    private static final Set<String> ALLOWED_STAGES = Set.of("interested", "contacted", "negotiating", "contracted");
+
     @GetMapping
     public List<Client> list(@RequestParam(value = "page", defaultValue = "0") int page,
                              @RequestParam(value = "size", defaultValue = "50") int size) {
@@ -58,9 +69,25 @@ public class ClientController {
         return clientRepo.findTop50ByOrderByCreatedAtDesc();
     }
 
-    static class ClientPayload {
+    static class ClientCreatePayload {
+        @NotBlank(message = "name is required")
         public String name;
+        @Pattern(regexp = "^[0-9+\\-\\s]{6,20}$", message = "invalid phone format")
         public String phone;
+        @Email(message = "invalid email format")
+        public String email;
+        public String source;
+        public String status;
+        public String notes;
+        public String classification;
+        public String pipelineStage;
+    }
+
+    static class ClientUpdatePayload {
+        public String name;
+        @Pattern(regexp = "^[0-9+\\-\\s]{6,20}$", message = "invalid phone format")
+        public String phone;
+        @Email(message = "invalid email format")
         public String email;
         public String source;
         public String status;
@@ -70,7 +97,20 @@ public class ClientController {
     }
 
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
-    public Map<String, Object> create(@RequestBody ClientPayload p) {
+    public Map<String, Object> create(@Valid @RequestBody ClientCreatePayload p) {
+        // require at least one contact method (email or phone)
+        boolean hasEmail = p.email != null && !p.email.trim().isEmpty();
+        boolean hasPhone = p.phone != null && !p.phone.replaceAll("[\\s-]", "").trim().isEmpty();
+        if(!hasEmail && !hasPhone){
+            throw new BadRequestException("email or phone is required");
+        }
+        // optional: restrict status and stage if present
+        if(p.status != null && !p.status.isBlank() && !ALLOWED_STATUS.contains(p.status.trim().toLowerCase())){
+            throw new BadRequestException("invalid status value");
+        }
+        if(p.pipelineStage != null && !p.pipelineStage.isBlank() && !ALLOWED_STAGES.contains(p.pipelineStage.trim().toLowerCase())){
+            throw new BadRequestException("invalid pipelineStage value");
+        }
         Client c = new Client(
                 safe(p.name), safe(p.phone), safe(p.email), safe(p.source), safe(p.status), safe(p.notes)
         );
@@ -81,20 +121,30 @@ public class ClientController {
     }
 
     @PutMapping(value = "/{id}", consumes = MediaType.APPLICATION_JSON_VALUE)
-    public Map<String, Object> update(@PathVariable("id") Long id, @RequestBody ClientPayload p) {
+    public Map<String, Object> update(@PathVariable("id") Long id, @Valid @RequestBody ClientUpdatePayload p) {
         Optional<Client> oc = clientRepo.findById(id);
         if (oc.isEmpty()) {
-            return Map.of("status", "not_found");
+            throw new ResourceNotFoundException("Client not found: " + id);
         }
         Client c = oc.get();
         if (p.name != null) c.setName(p.name);
         if (p.phone != null) c.setPhone(p.phone);
         if (p.email != null) c.setEmail(p.email);
         if (p.source != null) c.setSource(p.source);
-        if (p.status != null) c.setStatus(p.status);
+        if (p.status != null) {
+            if(!ALLOWED_STATUS.contains(p.status.trim().toLowerCase())){
+                throw new BadRequestException("invalid status value");
+            }
+            c.setStatus(p.status);
+        }
         if (p.notes != null) c.setNotes(p.notes);
         if (p.classification != null) c.setClassification(p.classification);
-        if (p.pipelineStage != null) c.setPipelineStage(p.pipelineStage);
+        if (p.pipelineStage != null) {
+            if(!ALLOWED_STAGES.contains(p.pipelineStage.trim().toLowerCase())){
+                throw new BadRequestException("invalid pipelineStage value");
+            }
+            c.setPipelineStage(p.pipelineStage);
+        }
         clientRepo.save(c);
         return Map.of("status", "ok");
     }
@@ -114,7 +164,7 @@ public class ClientController {
         String e = email == null ? "" : email.trim();
         String p = phone == null ? "" : phone.replaceAll("[\\s-]", "").trim();
         if (e.isBlank() && p.isBlank()) {
-            return Map.of("status", "bad_request", "message", "email or phone is required");
+            throw new BadRequestException("email or phone is required");
         }
         // Try find existing client
         Client client = null;
@@ -162,7 +212,7 @@ public class ClientController {
     @PostMapping("/fromContact/{contactId}")
     public Map<String, Object> createFromContact(@PathVariable("contactId") Long contactId) {
         var opt = contactRepo.findById(contactId);
-        if(opt.isEmpty()) return Map.of("status", "contact_not_found");
+        if(opt.isEmpty()) throw new ResourceNotFoundException("Contact message not found: " + contactId);
         var msg = opt.get();
         // deduplicate via email first then phone
         Client existing = null;
@@ -217,7 +267,7 @@ public class ClientController {
     public Map<String, Object> cancel(@PathVariable("id") Long id, @RequestBody(required = false) Map<String, String> payload) {
         Optional<Client> oc = clientRepo.findById(id);
         if (oc.isEmpty()) {
-            return Map.of("status", "not_found");
+            throw new ResourceNotFoundException("Client not found: " + id);
         }
         Client c = oc.get();
         c.setStatus("rejected");
@@ -256,7 +306,7 @@ public class ClientController {
     @DeleteMapping(value = "/{id}")
     public Map<String, Object> delete(@PathVariable("id") Long id){
         Optional<Client> oc = clientRepo.findById(id);
-        if (oc.isEmpty()) return Map.of("status","not_found");
+        if (oc.isEmpty()) throw new ResourceNotFoundException("Client not found: " + id);
         agreementRepo.deleteByClient_Id(id);
         interactionRepo.deleteByClient_Id(id);
         contactRepo.deleteByClient_Id(id);
@@ -264,8 +314,8 @@ public class ClientController {
         return Map.of("status","ok");
     }
     @GetMapping(value = "/{id}")
-    public Object getOne(@PathVariable("id") Long id){
-        return clientRepo.findById(id).orElse(Map.of("status","not_found"));
+    public Client getOne(@PathVariable("id") Long id){
+        return clientRepo.findById(id).orElseThrow(() -> new ResourceNotFoundException("Client not found: " + id));
     }
 
     @PutMapping(value = "/{id}/classification", consumes = MediaType.APPLICATION_JSON_VALUE)

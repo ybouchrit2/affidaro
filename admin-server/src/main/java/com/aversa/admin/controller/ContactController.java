@@ -6,8 +6,16 @@ import com.aversa.admin.repository.ContactMessageRepository;
 import com.aversa.admin.repository.ClientRepository;
 import com.aversa.admin.repository.ServiceItemRepository;
 import com.aversa.admin.model.ServiceItem;
+import com.aversa.admin.web.BadRequestException;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
+
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Pattern;
+import jakarta.validation.constraints.Size;
+import jakarta.validation.constraints.AssertTrue;
 
 import java.time.Instant;
 import java.util.List;
@@ -35,22 +43,35 @@ public class ContactController {
     }
 
     static class ContactPayload {
+        @Size(max = 100, message = "name too long")
         public String name;
+        @Email(message = "invalid email format")
         public String email;
+        @Pattern(regexp = "^[0-9+\\-\\s]{6,20}$", message = "invalid phone format")
         public String phone;
+        @Size(max = 100, message = "service too long")
         public String service;
         public Long serviceId;
+        @Size(max = 200, message = "location too long")
         public String location;
         public String propertyType;
         public String priority;
         public String budget;
         public String contactTime;
+        @Size(max = 3000, message = "details too long")
         public String details;
         public String source;
+
+        @AssertTrue(message = "email or phone is required")
+        public boolean hasContact(){
+            boolean hasEmail = email != null && !email.trim().isEmpty();
+            boolean hasPhone = phone != null && !phone.replaceAll("[\\s-]", "").trim().isEmpty();
+            return hasEmail || hasPhone;
+        }
     }
 
     @PostMapping(value = "/contact", consumes = MediaType.APPLICATION_JSON_VALUE)
-    public Map<String, Object> add(@RequestBody ContactPayload p,
+    public Map<String, Object> add(@Valid @RequestBody ContactPayload p,
                                    @RequestHeader(value = "User-Agent", required = false) String ua,
                                    @RequestHeader(value = "X-Forwarded-For", required = false) String xff,
                                    @RequestHeader Map<String, String> headers) {

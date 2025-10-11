@@ -1,9 +1,13 @@
 package com.aversa.admin.model;
 
 import jakarta.persistence.*;
+import jakarta.persistence.Index;
 import java.time.Instant;
 
 @Entity
+@Table(indexes = {
+        @Index(name = "idx_visit_timestamp", columnList = "timestamp")
+})
 public class VisitEntry {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

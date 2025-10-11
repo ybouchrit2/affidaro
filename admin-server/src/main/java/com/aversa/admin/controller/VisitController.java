@@ -47,23 +47,20 @@ public class VisitController {
 
     @GetMapping("/visits/stats")
     public Stats stats() {
-        List<VisitEntry> all = visitRepo.findAll();
-        int total = all.size();
         LocalDate todayDate = LocalDate.now(ZoneId.systemDefault());
-        int today = (int) all.stream().filter(v -> LocalDate.ofInstant(v.getTimestamp(), ZoneId.systemDefault()).equals(todayDate)).count();
-        Map<String, Integer> byPage = all.stream().collect(Collectors.toMap(
-                v -> Optional.ofNullable(v.getPage()).orElse("/"),
-                v -> 1,
-                Integer::sum
-        ));
+        int total = (int) visitRepo.count();
+        Instant start = todayDate.atStartOfDay(ZoneId.systemDefault()).toInstant();
+        Instant end = todayDate.plusDays(1).atStartOfDay(ZoneId.systemDefault()).toInstant();
+        int today = (int) visitRepo.countByTimestampBetween(start, end);
+
+        Map<String, Integer> byPage = visitRepo.countByPage().stream()
+                .collect(Collectors.toMap(
+                        arr -> (String) arr[0],
+                        arr -> ((Number) arr[1]).intValue()
+                ));
         List<VisitEntry> recent = visitRepo.findTop20ByOrderByTimestampDesc();
-        long avgDurationMs = (long) all.stream()
-                .map(VisitEntry::getDurationMs)
-                .filter(Objects::nonNull)
-                .filter(d -> d > 0)
-                .mapToLong(Long::longValue)
-                .average()
-                .orElse(0);
+        Double avg = visitRepo.averageDuration();
+        long avgDurationMs = avg != null ? Math.round(avg) : 0;
         return new Stats(total, today, byPage, recent, avgDurationMs);
     }
 

@@ -8,6 +8,8 @@ import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.crypto.factory.PasswordEncoderFactories;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.cors.CorsConfiguration;
@@ -41,22 +43,43 @@ public class SecurityConfig {
     }
 
     @Bean
+    public PasswordEncoder passwordEncoder() {
+        return PasswordEncoderFactories.createDelegatingPasswordEncoder();
+    }
+
+    @Bean
     public SecurityFilterChain filterChain(HttpSecurity http, JwtAuthFilter jwtAuthFilter) throws Exception {
         http
                 .csrf(csrf -> csrf.disable())
                 .cors(Customizer.withDefaults())
                 .sessionManagement(sm -> sm.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .headers(h -> h
-                        .contentSecurityPolicy(csp -> csp.policyDirectives("default-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://fonts.googleapis.com https://fonts.gstatic.com"))
+                        .contentSecurityPolicy(csp -> csp.policyDirectives(
+                                "default-src 'self'; " +
+                                "script-src 'self' https://cdn.jsdelivr.net https://unpkg.com https://cdnjs.cloudflare.com; " +
+                                "style-src 'self' https://cdn.jsdelivr.net https://fonts.googleapis.com; " +
+                                "font-src 'self' https://fonts.gstatic.com https://cdn.jsdelivr.net; " +
+                                "img-src 'self' data: https://cdn.jsdelivr.net; " +
+                                "connect-src 'self'; " +
+                                "object-src 'none'; " +
+                                "base-uri 'self'; " +
+                                "frame-ancestors 'none'"
+                        ))
                         .xssProtection(Customizer.withDefaults())
-                        .frameOptions(fo -> fo.sameOrigin())
+                        .frameOptions(fo -> fo.deny())
                 )
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(HttpMethod.POST, "/api/contact").permitAll()
                         .requestMatchers(HttpMethod.POST, "/api/visits").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/visits/stats").permitAll()
                         .requestMatchers(HttpMethod.POST, "/api/auth/login").permitAll()
-                        .requestMatchers("/admin/**", "/", "/index.html", "/home.html", "/assets/**").permitAll()
+                        // صفحات عامة ومحتوى الموقع
+                        .requestMatchers("/", "/index.html", "/home.html", "/landing.html", "/assets/**", "/sections/**", "/contact.html").permitAll()
+                        // السماح بصفحة الدخول ومواردها فقط
+                        .requestMatchers("/admin/login.html", "/admin/security.js", "/admin/admin.css", "/admin/admin.js").permitAll()
+                        // حماية باقي صفحات الإدارة وواجهاتها
+                        .requestMatchers("/admin/**").hasRole("ADMIN")
+                        // حماية واجهات API الإدارية
                         .requestMatchers("/api/**").hasRole("ADMIN")
                 )
                 .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
