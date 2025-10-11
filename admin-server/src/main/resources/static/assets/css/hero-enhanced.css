@@ -70,7 +70,7 @@
 
 /* Hero Title */
 .hero-title {
-  font-size: 3.5rem;
+  font-size: clamp(1.8rem, 4.8vw, 3.2rem);
   font-weight: 800;
   line-height: 1.2;
   margin-bottom: 1.5rem;
@@ -105,7 +105,7 @@
 
 /* Hero Description */
 .hero-description {
-  font-size: 1.3rem;
+  font-size: clamp(1rem, 2.2vw, 1.25rem);
   line-height: 1.6;
   margin-bottom: 2rem;
   color: rgba(255, 255, 255, 0.95);
@@ -292,13 +292,22 @@
 }
 
 /* Responsive Design */
+@media (min-width: 1200px) {
+  .hero-title {
+    font-size: clamp(2.4rem, 3.8vw, 3.4rem);
+  }
+  .hero-description {
+    font-size: clamp(1.05rem, 1.8vw, 1.3rem);
+  }
+}
+
 @media (max-width: 992px) {
   .hero-title {
-    font-size: 2.5rem;
+    font-size: clamp(2rem, 4vw, 2.6rem);
   }
   
   .hero-description {
-    font-size: 1.1rem;
+    font-size: clamp(0.95rem, 1.8vw, 1.1rem);
   }
   
   .trustbar {
@@ -309,23 +318,32 @@
 
 @media (max-width: 768px) {
   .hero {
-    min-height: 90vh;
-    padding: 2rem 0;
+    min-height: auto;
+    padding: 1.5rem 0 2rem;
   }
   
   .hero-title {
-    font-size: 2rem;
+    font-size: clamp(1.7rem, 6vw, 2.1rem);
     text-align: center;
   }
   
   .hero-description {
-    font-size: 1rem;
+    font-size: clamp(0.9rem, 2.8vw, 1rem);
     text-align: center;
   }
   
   .hero .btn {
     width: 100%;
     margin-bottom: 1rem;
+  }
+
+  .cta-group {
+    justify-content: center;
+    align-items: stretch;
+  }
+  .cta-group .btn {
+    width: 100%;
+    min-width: 0;
   }
   
   .trustbar-wrapper {
@@ -336,6 +354,21 @@
   .badge-cta {
     display: block !important;
     text-align: center;
+    margin-top: 1rem;
+  }
+}
+
+@media (max-width: 576px) {
+  .hero-title {
+    font-size: clamp(1.6rem, 7vw, 1.9rem);
+  }
+  .hero-description {
+    font-size: clamp(0.9rem, 3.5vw, 0.95rem);
+  }
+  .trustbar {
+    gap: 1rem;
+  }
+  .media-card {
     margin-top: 1rem;
   }
 }

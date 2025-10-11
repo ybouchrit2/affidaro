@@ -2328,6 +2328,127 @@ footer a:hover {
   z-index: 1;
 }
 
+/* تحسينات الاستجابة لقسم لماذا تختارنا والإحصائيات */
+@media (max-width: 768px) {
+  .why-us-section .section-subtitle {
+    font-size: 1rem;
+    margin-bottom: 1.25rem;
+  }
+
+  .why-card {
+    padding: 1.25rem;
+  }
+
+  .why-card-icon {
+    width: 64px;
+    height: 64px;
+    margin-bottom: 1rem;
+  }
+
+  .why-card-icon i {
+    font-size: 2rem;
+  }
+
+  .why-card-content h5 {
+    font-size: 1.1rem;
+  }
+
+  .why-card-content p {
+    font-size: 0.95rem;
+    line-height: 1.6;
+  }
+
+  .stat-item {
+    padding: 1.25rem;
+  }
+
+  .stat-value {
+    font-size: 2rem;
+  }
+
+  .stat-label {
+    font-size: 0.95rem;
+  }
+}
+
+@media (max-width: 576px) {
+  .why-card {
+    padding: 1rem;
+  }
+
+  .why-card-content h5 {
+    font-size: 1rem;
+  }
+
+  .why-card-content p {
+    font-size: 0.9rem;
+    line-height: 1.7;
+    overflow-wrap: anywhere; /* يمنع تجاوز السطر للنص العربي الطويل */
+    word-wrap: break-word;
+  }
+
+  .why-card-icon {
+    width: 56px;
+    height: 56px;
+  }
+
+  .why-card-icon i {
+    font-size: 1.75rem;
+  }
+
+  .stat-item {
+    padding: 1rem;
+  }
+
+  .stat-value {
+    font-size: 1.6rem;
+  }
+
+  .stat-label {
+    font-size: 0.9rem;
+    overflow-wrap: anywhere;
+    word-wrap: break-word;
+  }
+
+  .stats-container {
+    margin-top: 2rem;
+  }
+}
+
+/* ضبط عرض الإحصائيات على الشاشات الصغيرة لمنع التزاحم */
+@media (max-width: 576px) {
+  .stats-container .row > .col-6,
+  .stats-container .row > .col-md-3 {
+    flex: 0 0 100%;
+    max-width: 100%;
+  }
+
+  .stats-container .row {
+    gap: 12px;
+  }
+
+  .stat-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 96px;
+  }
+
+  .stat-item:hover {
+    transform: none;
+  }
+
+  .stat-value {
+    font-size: 1.4rem;
+  }
+
+  .stat-label {
+    font-size: 0.85rem;
+    line-height: 1.6;
+  }
+}
+
 /* تنسيقات قسم أعمالنا */
 .our-work {
   background: linear-gradient(to bottom, var(--bg), #ffffff);
