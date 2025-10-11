@@ -49,13 +49,10 @@
   margin-bottom: 1.5rem;
 }
 
-.brand-logo i {
-  font-size: 2rem;
-  color: #28a745;
-  background: rgba(40, 167, 69, 0.1);
-  padding: 0.75rem;
-  border-radius: 15px;
-  border: 2px solid rgba(40, 167, 69, 0.2);
+.brand-logo img {
+  height: 48px;
+  width: auto;
+  display: block;
 }
 
 .brand-logo span {

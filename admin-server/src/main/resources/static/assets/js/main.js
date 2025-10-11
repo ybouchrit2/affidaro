@@ -135,9 +135,10 @@
     if(pre) pre.style.display = 'none';
   }
 
-  // Ensure preloader is hidden on window load and as a fallback after 3s (reduced from 6s)
-  window.addEventListener('load', hidePreloader);
-  setTimeout(hidePreloader, 3000);
+  // Hide preloader earlier to avoid visible "جاري التحميل" during fast reloads
+  document.addEventListener('DOMContentLoaded', hidePreloader);
+  // Extra safety: hide again shortly after in case of race conditions
+  setTimeout(hidePreloader, 1500);
 
   // Back to top (guard for missing element)
   const backBtn = getElement('backToTop');
@@ -177,6 +178,8 @@
 
   // Lazy load sections
   document.addEventListener('DOMContentLoaded', function() {
+    // Ensure preloader is not shown once we start loading content
+    try { hidePreloader(); } catch(e) {}
     const lazyLoadSections = document.querySelectorAll('[data-include][data-lazy="true"]');
     
     if ('IntersectionObserver' in window) {
