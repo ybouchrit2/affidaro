@@ -16,6 +16,10 @@ services:
         sync: false
       - key: SPRING_DATASOURCE_PASSWORD
         sync: false
+      - key: JWT_SECRET
+        sync: false
+      - key: ALLOWED_ORIGINS
+        sync: false
       - key: SPRING_MAIL_HOST
         sync: false
       - key: SPRING_MAIL_USERNAME
