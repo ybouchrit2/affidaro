@@ -21,7 +21,7 @@
     <java.version>17</java.version>
   </properties>
 
-    <dependencies>
+  <dependencies>
     <dependency>
       <groupId>org.springframework.boot</groupId>
       <artifactId>spring-boot-starter-security</artifactId>
@@ -49,9 +49,6 @@
       <artifactId>h2</artifactId>
       <scope>runtime</scope>
     </dependency>
-  </dependencies>
-  
-  <dependencies>
     <!-- JWT for stateless auth -->
     <dependency>
       <groupId>io.jsonwebtoken</groupId>
