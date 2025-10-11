@@ -8,7 +8,7 @@
   let visitModal, contactModal;
 
   function fmtTs(ts){
-    try{ return new Date(ts).toLocaleString('ar-EG'); }catch(e){ return ts; }
+    try{ return new Date(ts).toLocaleString('it-IT'); }catch(e){ return ts; }
   }
   function fmtDateInputToMs(val){
     if(!val) return null;
@@ -22,7 +22,7 @@
   }
   function setLastUpdate(){
     const el = document.getElementById('lastUpdate');
-    el.textContent = new Date().toLocaleTimeString('ar-EG');
+    el.textContent = new Date().toLocaleTimeString('it-IT');
   }
   function setApiBase(){
     document.getElementById('apiBaseTxt').textContent = API;
@@ -48,7 +48,7 @@
     // Fill filter select
     const sel = document.getElementById('filterPage');
     const current = sel.value;
-    sel.innerHTML = '<option value="">الكل</option>' + entries.map(([p])=>`<option value="${p}">${p||'/'}</option>`).join('');
+    sel.innerHTML = '<option value="">Tutte</option>' + entries.map(([p])=>`<option value="${p}">${p||'/'}</option>`).join('');
     if(current) sel.value = current;
   }
 
@@ -107,10 +107,10 @@
     if(!list) return;
     list.innerHTML = '';
     const items = [
-      {k:'الوقت', v: fmtTs(v.timestamp)},
-      {k:'الصفحة', v: v.page||'/'},
-      {k:'المرجع', v: v.referrer||''},
-      {k:'المدة (ث)', v: v.durationMs ? Math.round(v.durationMs/1000) : 0},
+      {k:'Ora', v: fmtTs(v.timestamp)},
+      {k:'Pagina', v: v.page||'/'},
+      {k:'Referrer', v: v.referrer||''},
+      {k:'Durata (s)', v: v.durationMs ? Math.round(v.durationMs/1000) : 0},
     ];
     items.forEach(it=>{
       const li = document.createElement('li');
@@ -126,18 +126,18 @@
     if(!list) return;
     list.innerHTML = '';
     const items = [
-      {k:'الوقت', v: fmtTs(c.timestamp)},
-      {k:'الاسم', v: c.name||''},
-      {k:'الهاتف', v: c.phone||''},
-      {k:'البريد', v: c.email||''},
-      {k:'الخدمة', v: c.service||''},
-      {k:'الموقع', v: c.location||''},
-      {k:'نوع العقار', v: c.propertyType||''},
-      {k:'الأولوية', v: c.priority||''},
-      {k:'الميزانية', v: c.budget||''},
-      {k:'وقت التواصل', v: c.contactTime||''},
-      {k:'المصدر', v: c.source||''},
-      {k:'تفاصيل', v: c.details||''},
+      {k:'Ora', v: fmtTs(c.timestamp)},
+      {k:'Nome', v: c.name||''},
+      {k:'Telefono', v: c.phone||''},
+      {k:'Email', v: c.email||''},
+      {k:'Servizio', v: c.service||''},
+      {k:'Località', v: c.location||''},
+      {k:'Tipo di proprietà', v: c.propertyType||''},
+      {k:'Priorità', v: c.priority||''},
+      {k:'Budget', v: c.budget||''},
+      {k:'Orario di contatto', v: c.contactTime||''},
+      {k:'Fonte', v: c.source||''},
+      {k:'Dettagli', v: c.details||''},
     ];
     items.forEach(it=>{
       const li = document.createElement('li');
@@ -152,13 +152,19 @@
     try{
       setLoading(true);
       const res = await fetch(API + '/api/visits/stats', { credentials: 'include' });
-      const data = await res.json();
-      document.getElementById('statTotal').textContent = data.total ?? 0;
-      document.getElementById('statToday').textContent = data.today ?? 0;
-      const avgSec = Math.round((data.avgDurationMs || 0) / 1000);
-      document.getElementById('statAvg').textContent = avgSec;
-      byPageMap = data.byPage || {};
-      recentVisits = data.recent || [];
+      const ct = (res.headers && res.headers.get('content-type')) || '';
+      if(!res.ok || !ct.includes('application/json')){
+        byPageMap = {};
+        recentVisits = [];
+      }else{
+        const data = await res.json();
+        document.getElementById('statTotal').textContent = data.total ?? 0;
+        document.getElementById('statToday').textContent = data.today ?? 0;
+        const avgSec = Math.round((data.avgDurationMs || 0) / 1000);
+        document.getElementById('statAvg').textContent = avgSec;
+        byPageMap = data.byPage || {};
+        recentVisits = data.recent || [];
+      }
       renderByPage();
       renderVisits();
     }catch(e){ console.error('stats error', e); }

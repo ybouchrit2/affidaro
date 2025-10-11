@@ -33,7 +33,7 @@ body {
 }
 
 body {
-  font-family: 'Cairo', sans-serif;
+  font-family: 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
   background: var(--bg);
   margin: 0;
   padding: 0;
@@ -41,6 +41,7 @@ body {
   -webkit-font-smoothing: antialiased;
   overflow-x: hidden;
   line-height: 1.6;
+  direction: ltr;
 }
 
 .container {
@@ -370,7 +371,7 @@ section {
   position: relative;
   transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
   overflow: hidden;
-  text-align: right;
+  text-align: left;
   border: 1px solid rgba(255, 255, 255, 0.8);
   backdrop-filter: blur(10px);
 }
@@ -550,7 +551,7 @@ section {
 }
 
 .testimonial-user-info {
-  text-align: right;
+  text-align: left;
   flex: 1;
 }
 
@@ -727,12 +728,20 @@ footer a:hover {
   color: #fff;
   padding: 10px;
   display: none;
-  z-index: 9999;
+  z-index: 9998;
   width: 64px;
   height: 64px;
   border-radius: 50%;
-  font-size: 50px;
-  line-height: 0;
+  font-size: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: box-shadow 0.2s ease, transform 0.15s ease;
+}
+
+#backToTop:hover{
+  transform: translateY(-2px);
+  box-shadow: 0 14px 28px rgba(11, 94, 215, 0.25);
 }
 
 @media (max-width: 1200px) {
@@ -2332,7 +2341,7 @@ footer a:hover {
 }
 
 .stat-value {
-  font-size: 2.5rem;
+  font-size: clamp(1.7rem, 3.6vw, 2.2rem);
   font-weight: 700;
   color: var(--accent);
   margin-bottom: 0.5rem;
@@ -2346,6 +2355,29 @@ footer a:hover {
   color: var(--text-secondary);
   position: relative;
   z-index: 1;
+  line-height: 1.5;
+  text-align: center;
+  word-break: keep-all;
+  hyphens: none;
+}
+
+/* منع تعارض أنماط contact-section مع بطاقات الإحصاءات هنا */
+.stats-container .stat-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.stats-container .stat-value {
+  white-space: nowrap; /* يمنع تقطيع الكلمات مثل Garanzia */
+  overflow-wrap: normal;
+  word-break: keep-all;
+  hyphens: none;
+}
+
+.stats-container .stat-label {
+  margin-top: 0.35rem;
 }
 
 /* تحسين أحجام النص لقسم لماذا تختارنا باستخدام نسب مرنة */
@@ -2368,6 +2400,13 @@ footer a:hover {
 
 .why-card-content p {
   font-size: clamp(0.95rem, 2vw, 1rem);
+}
+
+/* توسيط نصوص لماذا تختارنا عبر المقاسات */
+.why-card-content,
+.why-card-content h5,
+.why-card-content p {
+  text-align: center;
 }
 
 /* تحسينات الاستجابة لقسم لماذا تختارنا والإحصائيات */
@@ -2411,6 +2450,15 @@ footer a:hover {
   .stat-label {
     font-size: 0.95rem;
   }
+
+  /* محاذاة وسط لبطاقات الإحصاءات على الشاشات الصغيرة */
+  .stats-container .stat-item {
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+  }
 }
 
 @media (max-width: 576px) {
@@ -2427,6 +2475,13 @@ footer a:hover {
     line-height: 1.7;
     overflow-wrap: anywhere; /* يمنع تجاوز السطر للنص العربي الطويل */
     word-wrap: break-word;
+  }
+
+  /* محاذاة وسط لمحتوى لماذا تختارنا */
+  .why-card-content,
+  .why-card-content h5,
+  .why-card-content p {
+    text-align: center;
   }
 
   .why-card-icon {
@@ -2448,8 +2503,10 @@ footer a:hover {
 
   .stat-label {
     font-size: 0.9rem;
-    overflow-wrap: anywhere;
-    word-wrap: break-word;
+    overflow-wrap: normal;
+    word-wrap: normal;
+    word-break: normal;
+    hyphens: none;
   }
 
   .stats-container {
@@ -2490,6 +2547,12 @@ footer a:hover {
     line-height: 1.6;
   }
 }
+
+/* تحسين توزيع بطاقات الإحصاءات وتخفيف الازدحام على الشاشات المتوسطة والكبيرة */
+.stats-container .row {
+  row-gap: 18px; /* احتفظ بتخطيط Bootstrap الأصلي وأضف مسافة عمودية فقط */
+}
+
 
 /* تنسيقات قسم أعمالنا */
 .our-work {
@@ -2545,7 +2608,7 @@ footer a:hover {
 
 .work-info {
   padding: 16px;
-  text-align: right;
+  text-align: left;
 }
 
 .work-info h5 {

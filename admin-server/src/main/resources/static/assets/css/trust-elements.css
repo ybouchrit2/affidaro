@@ -50,6 +50,8 @@
   font-weight: 600;
   color: #1e40af;
   transition: all 0.3s ease;
+  justify-content: center;
+  text-align: center;
 }
 
 .trust-item:hover {
@@ -100,13 +102,14 @@
 
 .guarantee-item {
   display: flex;
-  align-items: flex-start;
+  align-items: center;
   gap: 1rem;
   padding: 1rem;
   background: white;
   border-radius: 10px;
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
   transition: all 0.3s ease;
+  text-align: center;
 }
 
 .guarantee-item:hover {
@@ -117,7 +120,7 @@
 .guarantee-item i {
   color: #007bff;
   font-size: 1.5rem;
-  margin-top: 0.25rem;
+  margin-top: 0;
   flex-shrink: 0;
 }
 
@@ -133,6 +136,8 @@
   font-size: 0.9rem;
   margin: 0;
   line-height: 1.4;
+  word-break: keep-all;
+  hyphens: none;
 }
 
 /* CTA Note */
@@ -202,8 +207,9 @@
 
 .about-item {
   display: flex;
-  align-items: center;
-  padding: 1rem;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 1rem 1.25rem;
   margin-bottom: 1rem;
   background: rgba(0, 123, 255, 0.05);
   border-radius: 10px;
@@ -219,13 +225,30 @@
 .about-icon {
   color: #007bff;
   font-size: 1.5rem;
-  margin-left: 1rem;
+  margin-left: 0.5rem;
   flex-shrink: 0;
 }
 
 .about-item-content strong {
   color: #495057;
   font-weight: 600;
+}
+
+/* تحسين قابلية القراءة للنص داخل عناصر التعريف */
+.about-item-content {
+  line-height: 1.6;
+  word-break: keep-all;
+  hyphens: none;
+}
+
+@media (max-width: 576px) {
+  .about-item {
+    gap: 10px;
+    padding: 0.9rem 1rem;
+  }
+  .about-icon {
+    font-size: 1.3rem;
+  }
 }
 
 /* Responsive Design */

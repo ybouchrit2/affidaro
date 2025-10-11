@@ -1,14 +1,14 @@
 <!doctype html>
-<html lang="ar" dir="rtl" data-bs-theme="light">
+<html lang="it" dir="ltr" data-bs-theme="light">
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>تسجيل الدخول - لوحة الإدارة</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.rtl.min.css" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&display=swap" rel="stylesheet">
+    <title>Accesso - Pannello di amministrazione</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=Poppins:wght@600;700;800&display=swap" rel="stylesheet">
     <style>
       :root{ --brand:#0d6efd; --bg:#f8fafc; }
-      body{ font-family:'Cairo', system-ui, -apple-system, Segoe UI, Roboto, sans-serif; background:var(--bg); }
+      body{ font-family:'Inter', system-ui, -apple-system, Segoe UI, Roboto, sans-serif; background:var(--bg); direction:ltr; }
       .login-card{ max-width:420px; margin:10vh auto; border-radius:16px; box-shadow:0 10px 30px rgba(0,0,0,.08); }
       .brand{ color:var(--brand); font-weight:700; }
     </style>
@@ -17,25 +17,25 @@
     <div class="container">
       <div class="card login-card">
         <div class="card-body p-4">
-          <h1 class="h4 brand mb-3 text-center">لوحة الإدارة</h1>
-          <p class="text-secondary text-center mb-4">يرجى تسجيل الدخول للوصول إلى الإحصائيات والرسائل</p>
+          <h1 class="h4 brand mb-3 text-center">Pannello di amministrazione</h1>
+          <p class="text-secondary text-center mb-4">Accedi per visualizzare statistiche e messaggi</p>
           <!-- رسائل حالة -->
           <div id="status" class="mb-3">
             <!-- يعرض تلقائياً عند وجود ?error أو ?logout -->
           </div>
           <form method="post" action="/login" class="needs-validation" novalidate>
             <div class="mb-3">
-              <label for="username" class="form-label">اسم المستخدم</label>
+              <label for="username" class="form-label">Nome utente</label>
               <input type="text" class="form-control" id="username" name="username" required autocomplete="username">
-              <div class="invalid-feedback">الرجاء إدخال اسم المستخدم</div>
+              <div class="invalid-feedback">Inserisci il nome utente</div>
             </div>
             <div class="mb-3">
-              <label for="password" class="form-label">كلمة المرور</label>
+              <label for="password" class="form-label">Password</label>
               <input type="password" class="form-control" id="password" name="password" required autocomplete="current-password">
-              <div class="invalid-feedback">الرجاء إدخال كلمة المرور</div>
+              <div class="invalid-feedback">Inserisci la password</div>
             </div>
             <div class="d-grid gap-2">
-              <button type="submit" class="btn btn-primary">تسجيل الدخول</button>
+              <button type="submit" class="btn btn-primary">Accedi</button>
             </div>
           </form>
           <div class="mt-3 text-center">
@@ -58,9 +58,9 @@
         const params = new URLSearchParams(location.search);
         const status = document.getElementById('status');
         if(params.has('error')){
-          status.innerHTML = '<div class="alert alert-danger">بيانات غير صحيحة، حاول مرة أخرى.</div>';
+          status.innerHTML = '<div class="alert alert-danger">Credenziali non valide, riprova.</div>';
         }else if(params.has('logout')){
-          status.innerHTML = '<div class="alert alert-success">تم تسجيل الخروج بنجاح.</div>';
+          status.innerHTML = '<div class="alert alert-success">Logout effettuato con successo.</div>';
         }
       })();
     </script>

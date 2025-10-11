@@ -101,7 +101,7 @@
   background: transparent;
   border: none;
   padding: 2rem;
-  text-align: right;
+  text-align: left;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -166,7 +166,7 @@
   font-weight: 600;
   color: #1a202c;
   line-height: 1.4;
-  text-align: right;
+  text-align: left;
 }
 
 .toggle-icon {

@@ -1,0 +1,83 @@
+<section id="contact" class="contact-section py-5">
+  <div class="container">
+    <div class="row justify-content-center">
+      <div class="col-lg-8">
+        <h2 class="fw-bold mb-3">Ottieni un preventivo gratuito e dettagliato</h2>
+        <p class="text-muted mb-4">Compila il modulo e ti ricontattiamo entro 24 ore. Sopralluogo e misurazioni nelle aree servite.</p>
+        <div id="formMsg" class="alert" style="display:none" role="alert" aria-live="polite"></div>
+        <form id="contactForm" novalidate>
+          <div class="row g-3">
+            <div class="col-md-6">
+              <label for="name" class="form-label">Nome completo</label>
+              <input type="text" class="form-control" id="name" name="name" required placeholder="Es. Mario Rossi">
+            </div>
+            <div class="col-md-6">
+              <label for="email" class="form-label">Email</label>
+              <input type="email" class="form-control" id="email" name="email" required placeholder="nome@esempio.com">
+            </div>
+            <div class="col-md-6">
+              <label for="phone" class="form-label">Telefono</label>
+              <input type="tel" class="form-control" id="phone" name="phone" required pattern="^[0-9 +()-]{7,}$" placeholder="Es. +39 333 1234567">
+            </div>
+            <div class="col-md-6">
+              <label for="service" class="form-label">Servizio richiesto</label>
+              <select class="form-select" id="service" name="service" required>
+                <option value="">Seleziona…</option>
+                <option>Ristrutturazione completa</option>
+                <option>Pavimenti e rivestimenti</option>
+                <option>Tinteggiatura e finiture</option>
+                <option>Impianto elettrico</option>
+                <option>Cucina e bagno</option>
+                <option>Manutenzione</option>
+              </select>
+            </div>
+            <div class="col-md-6">
+              <label for="location" class="form-label">Località</label>
+              <input type="text" class="form-control" id="location" name="location" placeholder="Città / Provincia">
+            </div>
+            <div class="col-md-6">
+              <label for="propertyType" class="form-label">Tipo di proprietà</label>
+              <select class="form-select" id="propertyType" name="propertyType">
+                <option value="">Seleziona (opzionale)…</option>
+                <option>Appartamento</option>
+                <option>Villa</option>
+                <option>Ufficio</option>
+                <option>Negozio</option>
+              </select>
+            </div>
+            <div class="col-md-6">
+              <label for="priority" class="form-label">Priorità</label>
+              <select class="form-select" id="priority" name="priority">
+                <option value="">Seleziona (opzionale)…</option>
+                <option>Bassa</option>
+                <option>Media</option>
+                <option>Alta</option>
+              </select>
+            </div>
+            <div class="col-md-6">
+              <label for="budget" class="form-label">Budget indicativo</label>
+              <input type="text" class="form-control" id="budget" name="budget" placeholder="Es. € 5.000 - € 10.000">
+            </div>
+            <div class="col-md-6">
+              <label for="contactTime" class="form-label">Orario preferito</label>
+              <input type="text" class="form-control" id="contactTime" name="contactTime" placeholder="Es. 10:00 - 13:00">
+            </div>
+            <div class="col-12">
+              <label for="details" class="form-label">Dettagli del progetto</label>
+              <textarea class="form-control" id="details" name="details" rows="4" placeholder="Descrivi brevemente le lavorazioni richieste"></textarea>
+            </div>
+            <!-- Honeypot anti-spam -->
+            <div class="d-none" aria-hidden="true">
+              <label for="website" class="form-label">Website</label>
+              <input type="text" id="website" name="website" tabindex="-1" autocomplete="off">
+            </div>
+          </div>
+          <div class="d-flex gap-2 mt-4">
+            <button type="submit" class="btn btn-primary btn-lg">Invia richiesta</button>
+            <a href="https://wa.me/393509413724" target="_blank" rel="noopener" class="btn btn-outline-success btn-lg"><i class="bi bi-whatsapp me-2"></i> WhatsApp</a>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</section>

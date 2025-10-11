@@ -1,0 +1,92 @@
+:root{
+  --header-bg: rgba(255,255,255,0.85);
+  --header-blur: saturate(180%) blur(10px);
+  --header-border: rgba(0,0,0,0.06);
+  --brand-color: #111;
+  --accent: #0b5ed7;
+  --text: #333;
+}
+
+.site-header{
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+  background: var(--header-bg);
+  backdrop-filter: var(--header-blur);
+  -webkit-backdrop-filter: var(--header-blur);
+  border-bottom: 1px solid var(--header-border);
+  transition: box-shadow 0.2s ease;
+}
+.site-header.is-scrolled{ box-shadow: 0 6px 18px rgba(0,0,0,0.06); }
+
+.header-inner{
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0.6rem 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.brand{ display: inline-flex; align-items: center; gap: 0.5rem; text-decoration: none; color: var(--brand-color); font-weight: 700; }
+.brand img{ display:block; border-radius: 8px; }
+.brand span{ font-family: Poppins, Inter, system-ui, sans-serif; letter-spacing: 0.2px; }
+
+.nav-toggle{
+  border: 1px solid var(--header-border);
+  background: #fff;
+  color: var(--text);
+  padding: 0.4rem 0.5rem;
+  border-radius: 8px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+.nav-toggle:focus{ outline: 2px solid rgba(11,94,215,0.3); outline-offset: 2px; }
+
+.nav{ position: fixed; inset: 0 0 auto 0; top: var(--header-height, 60px); background: rgba(255,255,255,0.97); transform: translateY(-120%); transition: transform 0.2s ease; border-bottom: 1px solid var(--header-border); z-index: 1001; }
+.nav.open{ transform: translateY(0); }
+.nav ul{ list-style: none; margin: 0; padding: 0.75rem 1rem; display: grid; grid-template-columns: 1fr; gap: 0.25rem; }
+.nav a{ display: block; padding: 0.6rem 0.75rem; border-radius: 8px; text-decoration: none; color: var(--text); font-weight: 600; }
+.nav a:hover{ background: rgba(11,94,215,0.08); color: var(--accent); }
+.nav a:focus{ outline: 2px solid rgba(11,94,215,0.3); outline-offset: 2px; }
+.nav a.active{ color: var(--accent); background: rgba(11,94,215,0.08); }
+.nav li.highlight a{ color: #0f7a2f; background: rgba(15,122,47,0.08); }
+
+@media(min-width: 992px){
+  .nav{ position: static; transform: none; background: transparent; border: 0; }
+  .nav ul{ grid-template-columns: repeat(8, max-content); justify-content: end; align-items: center; gap: 0.25rem; }
+  .nav a{ padding: 0.5rem 0.75rem; }
+  .nav-toggle{ display: none; }
+}
+
+/* Body lock when menu open on mobile */
+body.nav-open{ overflow: hidden; }
+/* رفع طبقة زر القائمة لضمان أنه فوق أي عناصر قد تغطيه */
+.site-header .nav-toggle{ position: relative; z-index: 1002; }
+/* تأكيد طبقة قائمة التنقل المنسدلة فوق الرأس */
+.site-header .nav{ z-index: 1001; }
+/* تثبيت الهيدر بالأعلى بشكل دائم */
+.site-header{ position: fixed !important; top: 0; left: 0; right: 0; width: 100%; z-index: 1000; }
+
+/* هام: إزاحة افتراضية للمحتوى عندما يكون هناك هيدر ثابت */
+body.has-header{ padding-top: 68px; }
+
+/* اجعل عرض الهيدر على الشاشات الصغيرة مساوياً للشاشات الكبيرة */
+@media(max-width: 992px){
+  .site-header{ width: 100%; }
+  .header-inner{ max-width: 100% !important; width: 100% !important; margin: 0; padding: 0.75rem 1rem; gap: 0.75rem; }
+  .brand img{ width: 40px; height: 40px; }
+  .nav-toggle{ padding: 0.55rem 0.7rem; min-width: 40px; min-height: 40px; }
+  .nav{ background: rgba(255,255,255,0.96); backdrop-filter: saturate(180%) blur(8px); -webkit-backdrop-filter: saturate(180%) blur(8px); box-shadow: 0 12px 24px rgba(0,0,0,0.12); border-bottom-left-radius: 16px; border-bottom-right-radius: 16px; }
+  .nav ul{ padding: 0.75rem 1rem 1rem; gap: 0.5rem; }
+  .nav a{ padding: 0.9rem 1rem; font-size: 1rem; border-radius: 12px; }
+  .nav li.highlight a{ font-weight: 700; }
+}
+
+/* دعم حواف الآيفون الآمنة أسفل قائمة الموبايل */
+@supports (padding: env(safe-area-inset-bottom)){
+  .nav{ padding-bottom: env(safe-area-inset-bottom); }
+}

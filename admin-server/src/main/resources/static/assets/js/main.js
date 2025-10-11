@@ -239,6 +239,8 @@
         });
         // After injecting section HTML, ensure dynamic forms are bound
         try { bindContactFormIfPresent(); } catch(e) {}
+        // Ensure header nav bindings are active after header include is injected
+        try { bindHeaderNavIfPresent(); } catch(e) {}
         // تحديث عداد الزيارات بعد إدراج الأقسام التي قد تحتوي عنصر العرض
         try { updateVisitStats(); } catch(e) {}
       })
@@ -275,7 +277,7 @@
       service.setAttribute('aria-invalid', invalidService ? 'true' : 'false');
 
       if(invalidName||invalidEmail||invalidPhone||invalidService){
-        msgBox.style.display='block'; msgBox.className='alert alert-danger'; msgBox.textContent='يرجى ملء الحقول المطلوبة بشكل صحيح.'; 
+        msgBox.style.display='block'; msgBox.className='alert alert-danger'; msgBox.textContent='Per favore compila correttamente i campi richiesti.'; 
         msgBox.focus();
         return;
       }
@@ -293,11 +295,18 @@
         budget: document.getElementById('budget')?.value || '',
         contactTime: document.getElementById('contactTime')?.value || '',
         details: detailsEl ? detailsEl.value.trim() : '',
-        source: 'معاينة مجانية - صفحة هبوط Aversa'
+        source: 'Anteprima gratuita - Landing page Aversa'
       };
 
       // Show loading state
-      msgBox.style.display='block'; msgBox.className='alert alert-info'; msgBox.textContent='جاري إرسال طلبك...';
+      msgBox.style.display='block'; msgBox.className='alert alert-info'; msgBox.textContent='Invio della richiesta in corso...';
+
+      // Helper per link WhatsApp
+      const buildWhatsAppLink = (data) => {
+        const num = '393509413724';
+        const text = `Richiesta preventivo:\nNome: ${data.name}\nTelefono: ${data.phone}\nEmail: ${data.email}\nServizio: ${data.service}\nLuogo: ${data.location}\nDettagli: ${data.details}`;
+        return `https://wa.me/${num}?text=${encodeURIComponent(text)}`;
+      };
 
       try{
         const res = await fetch(API_BASE + '/api/contact',{
@@ -318,17 +327,69 @@
         }catch(e){}
         msgBox.style.display='none';
       } catch(err){
-        msgBox.className='alert alert-danger'; msgBox.textContent='حدث خطأ أثناء الإرسال. جرب مرة أخرى أو اتصل بالهاتف.';
+        const isDemo = ['localhost','127.0.0.1'].includes(location.hostname);
+        if(isDemo){
+          const successEl = document.getElementById('successModal');
+          if(window.bootstrap && successEl){
+            try{ const successModal = new bootstrap.Modal(successEl); successModal.show(); }catch(e){ /* ignore */ }
+          }
+          this.reset();
+          msgBox.style.display='none';
+        } else {
+          msgBox.className='alert alert-danger';
+          msgBox.innerHTML = `Si è verificato un errore durante l’invio. <a class="alert-link" href="${buildWhatsAppLink(payload)}" target="_blank" rel="noopener">Contattaci su WhatsApp</a> oppure riprova.`;
+        }
       }
     });
+    // evita الربط المزدوج لاحقاً
+    contactForm.dataset.bound = '1';
   }
 
-  // Smooth scroll for in-page links
+  // Smooth scroll for in-page links + focus first contact field when navigating to #contact
   try{
-    const anchors = document.querySelectorAll('a[href^="#"]');
-    if(anchors && anchors.length){
-      anchors.forEach(a=>{ a.addEventListener('click', function(e){ const target = document.querySelector(this.getAttribute('href')); if(target){ e.preventDefault(); target.scrollIntoView({behavior:'smooth'}); } }); });
-    }
+    // Delegate click handling to cover anchors loaded later via includes
+    const focusFirstContactField = () => {
+      const form = document.querySelector('#contactForm');
+      let firstField = form?.querySelector('input:not([type="hidden"]):not([disabled]), textarea, select');
+      if(!firstField) firstField = document.querySelector('#contact input:not([type="hidden"]):not([disabled]), #contact textarea, #contact select');
+      if(!firstField) return;
+      // Scroll so the field sits just below the header for immediate visibility
+      try{
+        const header = document.querySelector('.site-header');
+        const headerHeight = header ? (header.offsetHeight || parseInt(getComputedStyle(header).height) || 0) : 0;
+        const rect = firstField.getBoundingClientRect();
+        const y = Math.max(0, rect.top + window.scrollY - headerHeight - 12);
+        window.scrollTo({ top: y, behavior: 'auto' });
+      }catch(_){ /* ignore */ }
+      // Focus immediately and retry to be robust on mobile after scroll
+      const doFocus = () => { try{ firstField.focus({preventScroll:true}); }catch(e){ try{ firstField.focus(); }catch(__){} } };
+      doFocus();
+      setTimeout(doFocus, 250);
+      setTimeout(doFocus, 800);
+      try{ history.replaceState(null, '', '#contact'); }catch(_){ location.hash = '#contact'; }
+    };
+    document.addEventListener('click', function(ev){
+      const a = ev.target.closest('a[href^="#"]');
+      if(!a) return;
+      const href = a.getAttribute('href');
+      const target = document.querySelector(href);
+      if(!target) return;
+      ev.preventDefault();
+      const form = document.querySelector('#contactForm');
+      const goesToContact = (
+        href === '#contact' ||
+        href === '#contactForm' ||
+        a.hasAttribute('data-contact-focus') ||
+        target.id === 'contact' ||
+        (form && target.contains(form))
+      );
+      if(goesToContact){
+        focusFirstContactField();
+      } else {
+        const reduceMotionPref = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+        try{ target.scrollIntoView({behavior: reduceMotionPref ? 'auto' : 'smooth'}); }catch(_){ /* ignore */ }
+      }
+    }, true);
   } catch(e){ /* ignore */ }
 
   // Accessibility: focus outline for keyboard navigation
@@ -347,6 +408,96 @@
   } catch(e){ /* ignore */ }
 
 })();
+
+// Helper condiviso: costruisce un link WhatsApp con i dati del modulo
+function buildWhatsAppLink(data){
+  try{
+    const num = '393509413724';
+    const text = `Richiesta preventivo:\nNome: ${data.name}\nTelefono: ${data.phone}\nEmail: ${data.email}\nServizio: ${data.service}\nLuogo: ${data.location}\nDettagli: ${data.details}`;
+    return `https://wa.me/${num}?text=${encodeURIComponent(text)}`;
+  }catch(e){ return 'https://wa.me/393509413724'; }
+}
+
+// Header binding: toggle menu on mobile, add shadow on scroll, highlight active section
+function bindHeaderNavIfPresent(){
+  const header = document.querySelector('.site-header');
+  const toggle = header?.querySelector('.nav-toggle');
+  const nav = header?.querySelector('#mainNav');
+  if(!header || !toggle || !nav) return;
+
+  // اضبط موضع القائمة أسفل الرأس بحسب الارتفاع الفعلي
+  function setNavTop(){
+    try{
+      const h = header.offsetHeight || 60;
+      document.documentElement.style.setProperty('--header-height', h + 'px');
+      nav.style.top = h + 'px';
+    }catch(e){}
+  }
+  setNavTop();
+  window.addEventListener('resize', setNavTop, {passive:true});
+
+  // اضبط إزاحة محتوى الصفحة ليس تحت الهيدر الثابت
+  function setBodyOffset(){
+    try{
+      const h = header.offsetHeight || 60;
+      document.body.style.paddingTop = h + 'px';
+    }catch(e){}
+  }
+  setBodyOffset();
+  window.addEventListener('resize', setBodyOffset, {passive:true});
+
+  // وضع علامة أن الصفحة تحتوي هيدر ثابت لضبط الإزاحة الافتراضية بCSS
+  try{ document.body.classList.add('has-header'); }catch(e){}
+
+  function setExpanded(expanded){
+    toggle.setAttribute('aria-expanded', expanded ? 'true' : 'false');
+    nav.classList.toggle('open', !!expanded);
+    document.body.classList.toggle('nav-open', !!expanded);
+  }
+
+  toggle.addEventListener('click', function(){
+    const isOpen = this.getAttribute('aria-expanded') === 'true';
+    setExpanded(!isOpen);
+  });
+
+  // إغلاق بالنقر خارج القائمة
+  document.addEventListener('click', function(e){
+    const isOpen = toggle.getAttribute('aria-expanded') === 'true';
+    if(!isOpen) return;
+    if(!header.contains(e.target)) setExpanded(false);
+  });
+
+  // إغلاق بزر Escape
+  document.addEventListener('keydown', function(e){
+    if(e.key === 'Escape') setExpanded(false);
+  });
+
+  // Close menu when clicking a nav link
+  try{ nav.querySelectorAll('a').forEach(a=>{ a.addEventListener('click', ()=> setExpanded(false)); }); }catch(e){}
+
+  // Shadow on scroll
+  function onScroll(){ header.classList.toggle('is-scrolled', window.scrollY > 4); }
+  window.addEventListener('scroll', onScroll, {passive:true});
+  onScroll();
+
+  // Active section highlight
+  try{
+    const links = Array.from(nav.querySelectorAll('a[href^="#"]'));
+    const linkMap = new Map(links.map(l => [l.getAttribute('href'), l]));
+    const observer = new IntersectionObserver(entries => {
+      entries.forEach(entry => {
+        const id = '#' + entry.target.id;
+        const link = linkMap.get(id);
+        if(!link) return;
+        if(entry.isIntersecting){
+          links.forEach(l=>l.classList.remove('active'));
+          link.classList.add('active');
+        }
+      });
+    }, {rootMargin: '-40% 0px -50% 0px', threshold: 0.1});
+    document.querySelectorAll('section[id]').forEach(sec => observer.observe(sec));
+  }catch(e){}
+}
 
 // Robust binding: delegate submit for contact form, including late-loaded sections
 function bindContactFormIfPresent(){
@@ -381,13 +532,13 @@ function bindContactFormIfPresent(){
     const invalidEmail = !email.checkValidity();
     const invalidPhone = !phone.checkValidity();
     const invalidService = !service.value;
-    setError(name, invalidName ? 'الاسم مطلوب.' : '');
-    setError(email, invalidEmail ? 'رجاءً أدخل بريدًا إلكترونيًا صالحًا.' : '');
-    setError(phone, invalidPhone ? 'رقم الهاتف غير صالح.' : '');
-    setError(service, invalidService ? 'اختر الخدمة المطلوبة.' : '');
+    setError(name, invalidName ? 'Il nome è obbligatorio.' : '');
+    setError(email, invalidEmail ? 'Inserisci un’email valida.' : '');
+    setError(phone, invalidPhone ? 'Numero di telefono non valido.' : '');
+    setError(service, invalidService ? 'Seleziona il servizio richiesto.' : '');
 
     if(invalidName||invalidEmail||invalidPhone||invalidService){
-      msgBox.style.display='block'; msgBox.className='alert alert-danger'; msgBox.textContent='رجاءً أكمل الحقول المطلوبة بشكل صحيح.';
+      msgBox.style.display='block'; msgBox.className='alert alert-danger'; msgBox.textContent='Per favore completa correttamente i campi richiesti.';
       msgBox.focus();
       return;
     }
@@ -404,10 +555,10 @@ function bindContactFormIfPresent(){
       budget: document.getElementById('budget')?.value || '',
       contactTime: document.getElementById('contactTime')?.value || '',
       details: detailsEl ? detailsEl.value.trim() : '',
-      source: 'معاينة مجانية - صفحة هبوط Aversa'
+      source: 'Anteprima gratuita - Landing page Aversa'
     };
 
-    msgBox.style.display='block'; msgBox.className='alert alert-info'; msgBox.textContent='جاري إرسال طلبك...';
+    msgBox.style.display='block'; msgBox.className='alert alert-info'; msgBox.textContent='Invio della richiesta in corso...';
     if(submitBtn){ submitBtn.disabled = true; }
 
     try{
@@ -427,16 +578,28 @@ function bindContactFormIfPresent(){
         setError(service, '');
       }catch(e){}
       msgBox.style.display='none';
-    } catch(err){
-      msgBox.className='alert alert-danger'; msgBox.textContent='حدث خطأ أثناء الإرسال. يرجى المحاولة مرة أخرى أو التواصل عبر واتساب.';
-    }
-    if(submitBtn){ submitBtn.disabled = false; }
-  });
-  form.dataset.bound = '1';
-}
+      } catch(err){
+        const isDemo = ['localhost','127.0.0.1'].includes(location.hostname);
+        if(isDemo){
+          const successEl = document.getElementById('successModal');
+          if(window.bootstrap && successEl){
+            try{ const successModal = new bootstrap.Modal(successEl); successModal.show(); }catch(e){}
+          }
+          form.reset();
+          msgBox.style.display='none';
+        } else {
+          msgBox.className='alert alert-danger';
+          msgBox.innerHTML = `Si è verificato un errore durante l’invio. <a class="alert-link" href="${buildWhatsAppLink(payload)}" target="_blank" rel="noopener">Contattaci su WhatsApp</a> oppure riprova.`;
+        }
+      }
+      if(submitBtn){ submitBtn.disabled = false; }
+    });
+    form.dataset.bound = '1';
+  }
 
 // Attempt to bind on DOM ready and after a small delay for late-loaded includes
 document.addEventListener('DOMContentLoaded', function(){ try{ bindContactFormIfPresent(); }catch(e){} });
+document.addEventListener('DOMContentLoaded', function(){ try{ bindHeaderNavIfPresent(); }catch(e){} });
 setTimeout(function(){ try{ bindContactFormIfPresent(); }catch(e){} }, 1000);
 const contactForm = document.getElementById('contactForm');
 if(contactForm && contactForm.dataset.bound !== '1') {
@@ -452,7 +615,7 @@ if(contactForm && contactForm.dataset.bound !== '1') {
     // simple validation
     if(websiteHoneypot && websiteHoneypot.value.trim() !== '') { /* spam */ return; }
     if(!name.value.trim()||!email.checkValidity()||!phone.checkValidity()||!service.value){
-      msgBox.style.display='block'; msgBox.className='alert alert-danger'; msgBox.textContent='يرجى ملء الحقول المطلوبة بشكل صحيح.'; 
+      msgBox.style.display='block'; msgBox.className='alert alert-danger'; msgBox.textContent='Per favore compila correttamente i campi richiesti.'; 
       msgBox.focus();
       return;
     }
@@ -469,11 +632,18 @@ if(contactForm && contactForm.dataset.bound !== '1') {
       budget: document.getElementById('budget')?.value || '',
       contactTime: document.getElementById('contactTime')?.value || '',
       details: document.getElementById('details').value.trim(),
-      source: 'معاينة مجانية - صفحة هبوط Aversa'
+      source: 'Anteprima gratuita - Landing page Aversa'
     };
 
     // Show loading state
-    msgBox.style.display='block'; msgBox.className='alert alert-info'; msgBox.textContent='جاري إرسال طلبك...';
+    msgBox.style.display='block'; msgBox.className='alert alert-info'; msgBox.textContent='Invio della richiesta in corso...';
+
+    // Helper per link WhatsApp
+    const buildWhatsAppLink = (data) => {
+      const num = '393509413724';
+      const text = `Richiesta preventivo:\nNome: ${data.name}\nTelefono: ${data.phone}\nEmail: ${data.email}\nServizio: ${data.service}\nLuogo: ${data.location}\nDettagli: ${data.details}`;
+      return `https://wa.me/${num}?text=${encodeURIComponent(text)}`;
+    };
 
     try{
       const res = await fetch(API_BASE + '/api/contact',{
@@ -487,14 +657,15 @@ if(contactForm && contactForm.dataset.bound !== '1') {
       this.reset();
       msgBox.style.display='none';
     } catch(err){
-      msgBox.className='alert alert-danger'; msgBox.textContent='حدث خطأ أثناء الإرسال. جرب مرة أخرى أو اتصل بالهاتف.';
+      msgBox.className='alert alert-danger';
+      msgBox.innerHTML = `Si è verificato un errore durante l’invio. <a class="alert-link" href="${buildWhatsAppLink(payload)}" target="_blank" rel="noopener">Contattaci su WhatsApp</a> oppure riprova.`;
     }
-  });
-  contactForm.dataset.bound = '1';
-}
+    });
+    contactForm.dataset.bound = '1';
+  }
 
-// Smooth scroll for in-page links
-document.querySelectorAll('a[href^="#"]').forEach(a=>{ a.addEventListener('click', function(e){ const target = document.querySelector(this.getAttribute('href')); if(target){ e.preventDefault(); target.scrollIntoView({behavior:'smooth'}); } }); });
+// Smooth scroll for in-page links + focus first contact field when navigating to #contact
+// The per-anchor binding above is replaced by delegated handler to cover dynamically included content
 
 // Accessibility: focus outline for keyboard navigation
 document.addEventListener('keydown', function(e){ if(e.key==='Tab') document.body.classList.add('show-focus'); });
