@@ -10,4 +10,10 @@ public class RootController {
         // Serve public site at root; admin remains under /admin
         return "forward:/index.html";
     }
+
+    @GetMapping("/admin")
+    public String adminRoot() {
+        // Serve admin UI when hitting /admin
+        return "forward:/admin/index.html";
+    }
 }

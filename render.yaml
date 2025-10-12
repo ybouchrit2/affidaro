@@ -33,5 +33,3 @@ services:
         value: "587"
       - key: JAVA_OPTS
         value: "-Xms256m -Xmx512m"
-
-  # Removed separate static site; Java service serves both homepage and admin under one domain.
