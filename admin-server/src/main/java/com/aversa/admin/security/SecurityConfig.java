@@ -80,11 +80,9 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.POST, "/api/auth/login").permitAll()
                         // صفحات عامة ومحتوى الموقع
                         .requestMatchers("/", "/index.html", "/home.html", "/landing.html", "/assets/**", "/sections/**", "/contact.html").permitAll()
-                        // السماح بصفحة الدخول ومواردها فقط
-                        .requestMatchers("/admin/login.html", "/admin/security.js", "/admin/admin.css", "/admin/admin.js").permitAll()
-                        // حماية باقي صفحات الإدارة وواجهاتها
-                        .requestMatchers("/admin/**").hasRole("ADMIN")
-                        // حماية واجهات API الإدارية
+                        // السماح بكافة صفحات وموارد الواجهة الإدارية (الحماية تتم على مستوى واجهات الـAPI)
+                        .requestMatchers("/admin/**").permitAll()
+                        // حماية واجهات API الإدارية فقط
                         .requestMatchers("/api/**").hasRole("ADMIN")
                 )
                 .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
