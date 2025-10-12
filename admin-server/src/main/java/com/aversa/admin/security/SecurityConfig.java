@@ -60,8 +60,8 @@ public class SecurityConfig {
                                 "script-src 'self' https://cdn.jsdelivr.net https://unpkg.com https://cdnjs.cloudflare.com; " +
                                 // Styles from jsDelivr, Google Fonts, Cloudflare CDNJS, and allow inline style attributes used by UI toggles
                                 "style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://fonts.googleapis.com https://cdnjs.cloudflare.com https://www.gstatic.com; " +
-                                // Fonts from Google Fonts and jsDelivr
-                                "font-src 'self' https://fonts.gstatic.com https://cdn.jsdelivr.net; " +
+                                // Fonts from Google Fonts, jsDelivr, and CDNJS (Font Awesome webfonts)
+                                "font-src 'self' https://fonts.gstatic.com https://cdn.jsdelivr.net https://cdnjs.cloudflare.com; " +
                                 // Images (including data URIs) and jsDelivr assets
                                 "img-src 'self' data: https://cdn.jsdelivr.net; " +
                                 // Allow XHR/fetch to self and jsDelivr (avoids sourcemap warnings and future API CDN use)
