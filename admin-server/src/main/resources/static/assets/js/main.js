@@ -165,16 +165,30 @@
     resizeTimer = setTimeout(updateSticky, 100);
   }, {passive: true});
 
-  // Cookie bar
-  const cb = getElement('cookieBar');
-  if(cb && !localStorage.getItem('cookiesAccepted')) {
-    cb.style.display = 'flex';
-    const acceptBtn = getElement('acceptCookies');
-    if(acceptBtn) acceptBtn.addEventListener('click', function(){ 
-      localStorage.setItem('cookiesAccepted','1'); 
-      cb.style.display = 'none'; 
-    });
+  // Cookie bar: ensure it initializes even when sections are injected later
+  function initCookieBarIfPresent(){
+    const cbEl = document.getElementById('cookieBar');
+    if(!cbEl) return;
+    // Avoid double-binding if called multiple times
+    if(cbEl.dataset.initialized === '1'){
+      // Respect prior acceptance state
+      if(localStorage.getItem('cookiesAccepted')) cbEl.style.display = 'none';
+      return;
+    }
+    cbEl.dataset.initialized = '1';
+    if(!localStorage.getItem('cookiesAccepted')){
+      cbEl.style.display = 'flex';
+      const acceptBtn = document.getElementById('acceptCookies');
+      if(acceptBtn) acceptBtn.addEventListener('click', function(){
+        try{ localStorage.setItem('cookiesAccepted','1'); }catch(e){}
+        cbEl.style.display = 'none';
+      });
+    } else {
+      cbEl.style.display = 'none';
+    }
   }
+  // Try early in case cookie bar exists in initial DOM
+  try{ initCookieBarIfPresent(); }catch(e){}
 
   // Lazy load sections
   document.addEventListener('DOMContentLoaded', function() {
@@ -237,12 +251,14 @@
           newScript.textContent = script.textContent;
           script.parentNode.replaceChild(newScript, script);
         });
-        // After injecting section HTML, ensure dynamic forms are bound
+        // After injecting section HTML, ensure dynamic forms and UI bindings are active
         try { bindContactFormIfPresent(); } catch(e) {}
         // Ensure header nav bindings are active after header include is injected
         try { bindHeaderNavIfPresent(); } catch(e) {}
         // تحديث عداد الزيارات بعد إدراج الأقسام التي قد تحتوي عنصر العرض
         try { updateVisitStats(); } catch(e) {}
+        // Initialize cookie bar if this section contained it
+        try { initCookieBarIfPresent(); } catch(e) {}
       })
       .catch(error => {
         console.warn('Error loading section:', url, error);

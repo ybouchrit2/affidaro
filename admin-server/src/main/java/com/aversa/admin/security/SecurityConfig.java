@@ -56,11 +56,16 @@ public class SecurityConfig {
                 .headers(h -> h
                         .contentSecurityPolicy(csp -> csp.policyDirectives(
                                 "default-src 'self'; " +
+                                // Allow core CDNs for scripts
                                 "script-src 'self' https://cdn.jsdelivr.net https://unpkg.com https://cdnjs.cloudflare.com; " +
-                                "style-src 'self' https://cdn.jsdelivr.net https://fonts.googleapis.com; " +
+                                // Styles from jsDelivr, Google Fonts, Cloudflare CDNJS, and allow inline style attributes used by UI toggles
+                                "style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://fonts.googleapis.com https://cdnjs.cloudflare.com https://www.gstatic.com; " +
+                                // Fonts from Google Fonts and jsDelivr
                                 "font-src 'self' https://fonts.gstatic.com https://cdn.jsdelivr.net; " +
+                                // Images (including data URIs) and jsDelivr assets
                                 "img-src 'self' data: https://cdn.jsdelivr.net; " +
-                                "connect-src 'self'; " +
+                                // Allow XHR/fetch to self and jsDelivr (avoids sourcemap warnings and future API CDN use)
+                                "connect-src 'self' https://cdn.jsdelivr.net; " +
                                 "object-src 'none'; " +
                                 "base-uri 'self'; " +
                                 "frame-ancestors 'none'"
