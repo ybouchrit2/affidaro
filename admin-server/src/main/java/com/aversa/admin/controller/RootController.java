@@ -7,7 +7,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 public class RootController {
     @GetMapping("/")
     public String root() {
-        // Serve admin login as the root page on the admin service
-        return "forward:/admin/login.html";
+        // Serve public site at root; admin remains under /admin
+        return "forward:/index.html";
     }
 }
