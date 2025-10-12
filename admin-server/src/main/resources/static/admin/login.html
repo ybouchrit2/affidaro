@@ -23,20 +23,21 @@
           <div id="status" class="mb-3">
             <!-- يعرض تلقائياً عند وجود ?error أو ?logout -->
           </div>
-          <form method="post" action="/login" class="needs-validation" novalidate>
+          <form class="needs-validation" novalidate>
             <div class="mb-3">
               <label for="username" class="form-label">Nome utente</label>
-              <input type="text" class="form-control" id="username" name="username" required autocomplete="username">
+              <input type="text" class="form-control" id="loginUser" name="username" required autocomplete="username">
               <div class="invalid-feedback">Inserisci il nome utente</div>
             </div>
             <div class="mb-3">
               <label for="password" class="form-label">Password</label>
-              <input type="password" class="form-control" id="password" name="password" required autocomplete="current-password">
+              <input type="password" class="form-control" id="loginPass" name="password" required autocomplete="current-password">
               <div class="invalid-feedback">Inserisci la password</div>
             </div>
             <div class="d-grid gap-2">
-              <button type="submit" class="btn btn-primary">Accedi</button>
+              <button type="button" id="loginSubmit" class="btn btn-primary">Accedi</button>
             </div>
+            <div id="loginMsg" class="mt-2 small"></div>
           </form>
           <div class="mt-3 text-center">
             <small class="text-muted">© Aversa</small>
@@ -45,24 +46,6 @@
       </div>
     </div>
 
-    <script>
-      // Bootstrap validation
-      (()=>{
-        const forms = document.querySelectorAll('.needs-validation');
-        Array.from(forms).forEach(form => {
-          form.addEventListener('submit', event => {
-            if (!form.checkValidity()) { event.preventDefault(); event.stopPropagation(); }
-            form.classList.add('was-validated');
-          }, false);
-        });
-        const params = new URLSearchParams(location.search);
-        const status = document.getElementById('status');
-        if(params.has('error')){
-          status.innerHTML = '<div class="alert alert-danger">Credenziali non valide, riprova.</div>';
-        }else if(params.has('logout')){
-          status.innerHTML = '<div class="alert alert-success">Logout effettuato con successo.</div>';
-        }
-      })();
-    </script>
+    <script src="/admin/security.js" defer></script>
   </body>
 </html>

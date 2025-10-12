@@ -24,6 +24,16 @@
   function bindLogin(){
     const btn = document.getElementById('loginSubmit');
     if(!btn) return;
+    // Bootstrap style validation without inline scripts
+    try{
+      const form = btn.closest('form');
+      if(form){
+        form.addEventListener('submit', (event)=>{
+          if(!form.checkValidity()){ event.preventDefault(); event.stopPropagation(); }
+          form.classList.add('was-validated');
+        });
+      }
+    }catch(e){}
     btn.addEventListener('click', async () => {
       const username = document.getElementById('loginUser').value;
       const password = document.getElementById('loginPass').value;
@@ -52,6 +62,19 @@
     });
   }
 
-  if(document.readyState==='complete' || document.readyState==='interactive') bindLogin();
-  else document.addEventListener('DOMContentLoaded', bindLogin);
+  // Status messages via query params (?error, ?logout) without inline JS
+  function showStatusIfPresent(){
+    const status = document.getElementById('status');
+    if(!status) return;
+    const params = new URLSearchParams(location.search);
+    if(params.has('error')){
+      status.innerHTML = '<div class="alert alert-danger">Credenziali non valide, riprova.</div>';
+    }else if(params.has('logout')){
+      status.innerHTML = '<div class="alert alert-success">Logout effettuato con successo.</div>';
+    }
+  }
+
+  function init(){ bindLogin(); showStatusIfPresent(); }
+  if(document.readyState==='complete' || document.readyState==='interactive') init();
+  else document.addEventListener('DOMContentLoaded', init);
 })();
