@@ -10,7 +10,6 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/api/services")
-@CrossOrigin
 public class ServiceController {
 
     private final ServiceItemRepository repo;

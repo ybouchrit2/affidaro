@@ -11,12 +11,6 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/api/analytics")
-@CrossOrigin(
-        origins = {"http://localhost", "http://localhost:8001", "http://localhost:8089"},
-        allowCredentials = "true",
-        allowedHeaders = {"Content-Type", "X-Requested-With", "Origin", "Accept"},
-        methods = {RequestMethod.GET, RequestMethod.OPTIONS}
-)
 public class AnalyticsController {
 
     private final VisitEntryRepository visitRepo;

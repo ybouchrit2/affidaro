@@ -12,17 +12,13 @@
   <!-- Admin custom styling aligned with main site -->
   <link rel="stylesheet" href="/admin/admin.css">
   
-  <script>
-    // Usa lo stesso origin del server come base per le API
-    window.API_BASE = location.origin;
-  </script>
 </head>
 <body>
   <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
     <div class="container-fluid align-items-center">
       <a class="navbar-brand" href="#"><i class="bi bi-speedometer2 me-1"></i> Affidaro Admin</a>
       <div class="ms-auto d-flex align-items-center gap-3">
-        <a class="btn btn-outline-light btn-sm" href="http://localhost/aversa_website/index.html" target="_blank"><i class="bi bi-box-arrow-up-right"></i> Vai al sito</a>
+        <a class="btn btn-outline-light btn-sm" href="https://affidaro.com/" target="_blank"><i class="bi bi-box-arrow-up-right"></i> Vai al sito</a>
         <span id="apiPill" class="pill">API: <span id="apiBaseTxt">—</span></span>
         <small class="text-light d-flex align-items-center gap-2">Ultimo aggiornamento: <span id="lastUpdate">—</span> <span id="loadingSpinner" class="spinner-border spinner-border-sm" role="status" style="visibility:hidden"></span> <span id="updatingText" class="text-warning" style="visibility:hidden">يتم التحديث…</span></small>
         <button class="btn btn-warning btn-sm" data-bs-toggle="modal" data-bs-target="#loginModal"><i class="bi bi-person-lock"></i> Login</button>

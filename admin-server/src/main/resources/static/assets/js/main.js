@@ -343,7 +343,7 @@
         }catch(e){}
         msgBox.style.display='none';
       } catch(err){
-        const isDemo = ['localhost','127.0.0.1'].includes(location.hostname);
+        const isDemo = false;
         if(isDemo){
           const successEl = document.getElementById('successModal');
           if(window.bootstrap && successEl){
@@ -595,7 +595,7 @@ function bindContactFormIfPresent(){
       }catch(e){}
       msgBox.style.display='none';
       } catch(err){
-        const isDemo = ['localhost','127.0.0.1'].includes(location.hostname);
+        const isDemo = false;
         if(isDemo){
           const successEl = document.getElementById('successModal');
           if(window.bootstrap && successEl){

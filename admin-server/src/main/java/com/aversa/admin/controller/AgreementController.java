@@ -32,12 +32,6 @@ import java.util.Set;
 
 @RestController
 @RequestMapping("/api/agreements")
-@CrossOrigin(
-        origins = {"http://localhost", "http://localhost:8001", "http://localhost:8089"},
-        allowCredentials = "true",
-        allowedHeaders = {"Content-Type", "X-Requested-With", "Origin", "Accept"},
-        methods = {RequestMethod.GET, RequestMethod.POST, RequestMethod.PUT, RequestMethod.OPTIONS}
-)
 public class AgreementController {
 
     private final AgreementRepository agreementRepo;

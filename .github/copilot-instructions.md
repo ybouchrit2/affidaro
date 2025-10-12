@@ -4,15 +4,9 @@ Summary
 - This is a small static, RTL (Arabic) marketing site under `c:/xampp/htdocs/aversa_website`.
 - Pages are assembled client-side from HTML partials located in `sections/` using a simple fetch loader in `index.html`.
 
-Quick serve & preview
-- Prefer serving over HTTP (file:// blocks fetch). The project lives in XAMPP `htdocs`, so Apache serves it at:
-  - http://localhost/aversa_website/
-- Quick alternative local server from the project root:
-  ```powershell
-  # from c:\xampp\htdocs\aversa_website
-  python -m http.server 5500
-  # then open http://localhost:5500
-  ```
+Preview
+- Production: open `https://affidaro.com/` and `https://affidaro.com/admin/index.html`.
+- For internal testing, serve over HTTPS on your domain.
 
 Key files & patterns (important to reference)
 - `index.html` — entry point. Loads vendor CDNs (Bootstrap, AOS, icons, Google Fonts) and `assets/js/main.js`.

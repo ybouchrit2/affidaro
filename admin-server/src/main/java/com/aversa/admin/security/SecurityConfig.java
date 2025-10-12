@@ -29,7 +29,7 @@ public class SecurityConfig {
     @Value("${jwt.ttlMillis:28800000}")
     private long jwtTtlMillis;
 
-    @Value("${allowed.origins:http://localhost,http://localhost:8001}")
+    @Value("${allowed.origins:https://affidaro.com,https://www.affidaro.com}")
     private String allowedOrigins;
 
     @Bean

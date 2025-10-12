@@ -7,14 +7,9 @@
 - `assets/` الموارد (صور، CSS، JS).
 - `admin-server/` مشروع Spring Boot لخدمات الإدارة وواجهات `/admin`.
 
-## التشغيل المحلي
-- واجهة الموقع: تشغيل خادم PHP مدمج:
-  - `php -S localhost:8001 -t C:\xampp\htdocs\aversa_website`
-  - فتح `http://localhost:8001/`
-- لوحة الإدارة: تشغيل الـ JAR بملف تعريف H2:
-  - إعداد `JAVA_HOME` (يوجد JDK ضمن `admin-server/tools/jdk17/`).
-  - `java -jar admin-server/target/admin-server-0.0.1-SNAPSHOT.jar --spring.profiles.active=h2`
-  - فتح `http://localhost:8090/admin/index.html`
+## التشغيل والإنتاج
+- الموقع: افتح `https://affidaro.com/`
+- لوحة الإدارة: افتح `https://affidaro.com/admin/index.html`
 
 ## ملاحظات الإصدار
 - تم تحديث لوحة الإدارة لعرض جميع حقول نموذج التواصل.

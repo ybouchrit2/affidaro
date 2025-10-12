@@ -14,7 +14,6 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/api/auth")
-@CrossOrigin
 public class AuthController {
 
     private static final Logger log = LoggerFactory.getLogger(AuthController.class);
@@ -55,7 +54,7 @@ public class AuthController {
             return Map.of("status","ok","token", token);
         }
         log.warn("AUTH FAILED: user={} ip={} reason={}", u, ip, !userOk ? "bad_username" : "bad_password");
-        return Map.of("status","unauthorized");
+        throw new org.springframework.security.core.AuthenticationException("Invalid username or password") {};
     }
 
     private String sanitizeUsername(String input) {

@@ -24,12 +24,6 @@ import java.util.Optional;
 
 @RestController
 @RequestMapping("/api")
-@CrossOrigin(
-        origins = {"http://localhost", "http://localhost:8001", "http://localhost:8089"},
-        allowCredentials = "true",
-        allowedHeaders = {"Content-Type", "X-Requested-With", "Origin", "Accept"},
-        methods = {RequestMethod.GET, RequestMethod.POST, RequestMethod.OPTIONS}
-)
 public class ContactController {
 
     private final ContactMessageRepository repo;

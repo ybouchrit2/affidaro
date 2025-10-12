@@ -58,8 +58,8 @@
 <script>
 async function load(){
   const [sumRes, statsRes] = await Promise.all([
-    fetch('http://localhost:8090/api/analytics'),
-    fetch('http://localhost:8090/api/visits/stats')
+    fetch('/api/analytics'),
+    fetch('/api/visits/stats')
   ]);
   const summary = await sumRes.json();
   const stats = await statsRes.json();

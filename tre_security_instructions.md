@@ -189,7 +189,7 @@
   @Bean
   public CorsConfigurationSource corsConfigurationSource() {
       CorsConfiguration config = new CorsConfiguration();
-      config.setAllowedOrigins(List.of("https://admin.affidaro.com"));
+config.setAllowedOrigins(List.of("https://affidaro.com", "https://www.affidaro.com"));
       config.setAllowedMethods(List.of("GET","POST","PUT","DELETE","OPTIONS"));
       config.setAllowedHeaders(List.of("Content-Type","Authorization","X-Requested-With","Origin","Accept"));
       config.setAllowCredentials(true);
@@ -295,7 +295,7 @@ DB_USER=affidaro_user
 DB_PASSWORD=<secure_password>
 DB_SSL=true
 
-CORS_ALLOWED_ORIGINS=https://admin.affidaro.com
+CORS_ALLOWED_ORIGINS=https://affidaro.com,https://www.affidaro.com
 RATE_LIMIT_PER_MINUTE=60
 
 MAIL_SMTP_HOST=smtp.example.com
