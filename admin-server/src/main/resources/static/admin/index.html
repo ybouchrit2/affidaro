@@ -8,13 +8,13 @@
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
   <!-- Inter/Poppins to match public site -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&family=Poppins:wght@600;700;800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@600;700;800&family=Cairo:wght@400;600;700&display=swap" rel="stylesheet">
   <!-- Admin custom styling aligned with main site -->
   <link rel="stylesheet" href="admin.css">
   
 </head>
 <body class="with-sidebar">
-  <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+  <nav class="navbar navbar-expand-lg navbar-dark bg-primary shadow-sm">
     <div class="container-fluid align-items-center">
       <a class="navbar-brand" href="#"><i class="bi bi-speedometer2 me-1"></i> Affidaro Admin</a>
       <button class="btn btn-outline-light btn-sm d-lg-none ms-2" id="sidebarToggle"><i class="bi bi-list"></i></button>
@@ -141,7 +141,7 @@
               <small class="muted">Mostra prime 20 — usa i filtri sopra</small>
             </div>
             <div class="table-responsive sticky-table">
-              <table class="table table-sm table-striped align-middle">
+              <table class="table table-hover table-sm table-striped align-middle">
                 <thead>
                   <tr>
                     <th>Ora</th><th>Pagina</th><th>Referrer</th><th>Durata (s)</th>
@@ -162,7 +162,7 @@
           <small class="muted">Include campi aggiuntivi: località, tipo immobile, priorità, budget, orario preferito</small>
         </div>
         <div class="table-responsive sticky-table">
-          <table class="table table-sm table-striped align-middle">
+          <table class="table table-hover table-sm table-striped align-middle">
             <thead>
               <tr>
                 <th>Ora</th><th>Nome</th><th>Telefono</th><th>Email</th><th>Servizio</th>
@@ -248,7 +248,7 @@
                 </div>
               </div>
             <div class="table-responsive sticky-table mt-2">
-              <table class="table table-sm table-striped align-middle">
+              <table class="table table-hover table-sm table-striped align-middle">
                 <thead>
                   <tr>
                     <th data-sort="createdAt">Data</th><th data-sort="name">Nome</th><th data-sort="phone">Telefono</th><th data-sort="email">Email</th><th data-sort="status">Stato</th><th data-sort="source">Sorgente</th>
@@ -340,7 +340,7 @@
                   </div>
                 </div>
                 <div class="table-responsive sticky-table mt-2">
-                  <table class="table table-sm table-striped align-middle">
+                  <table class="table table-hover table-sm table-striped align-middle">
                     <thead>
                       <tr>
                         <th>وقت</th><th>قناة</th><th>مستخدم</th><th>ملاحظات</th><th>نتيجة</th>
@@ -389,7 +389,7 @@
 
             <hr />
             <div class="table-responsive sticky-table">
-              <table class="table table-sm table-striped align-middle">
+              <table class="table table-hover table-sm table-striped align-middle">
                 <thead>
                   <tr>
                     <th data-sort="signedAt">Data</th><th data-sort="service">Servizio</th><th data-sort="agreedPrice">Prezzo</th><th data-sort="currency">Valuta</th><th data-sort="status">Stato</th>
@@ -458,6 +458,7 @@
   <script src="admin.js"></script>
   <script src="sidebar.js"></script>
   <script src="security.js"></script>
+  <script src="ui.js"></script>
 
   <!-- Login Modal -->
   <div class="modal fade" id="loginModal" tabindex="-1" aria-hidden="true">

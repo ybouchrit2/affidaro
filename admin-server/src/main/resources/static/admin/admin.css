@@ -1,32 +1,33 @@
 /* Admin styling aligned with main site aesthetics */
 :root {
-  --bg: #f8fafd;
+  --bg: #f8f9fa; /* الخلفية المطلوبة */
   --card: #ffffff;
-  --muted: #5a6572;
-  --primary: #1e40af;
-  --primary-dark: #0f2167;
+  --muted: #6c757d; /* الثانوي */
+  --primary: #0056b3; /* الأزرق Affidaro */
+  --primary-dark: #003d80;
+  --secondary: #6c757d;
   --accent: #f59e0b;
   --accent-dark: #d97706;
-  --success: #10b981;
-  --danger: #ef4444;
+  --success: #198754;
+  --danger: #dc3545;
   --glass: rgba(255, 255, 255, 0.92);
   --shadow: 0 10px 30px rgba(13, 38, 77, 0.08);
   --shadow-lg: 0 20px 45px rgba(13, 38, 77, 0.12);
   --radius: 16px;
-  --radius-sm: 10px;
+  --radius-sm: 12px;
   --grid-gap: 16px;
 }
 
 html, body { height: 100%; }
 body {
-  font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Helvetica, Arial, sans-serif;
+  font-family: 'Poppins','Cairo', sans-serif;
   background: var(--bg);
   color: #0a1525;
 }
 
-.navbar-dark.bg-dark {
-  background: linear-gradient(160deg, rgba(30, 64, 175, 0.96), rgba(15, 33, 103, 0.88));
-  box-shadow: var(--shadow-lg);
+.navbar-dark.bg-primary {
+  background-color: var(--primary) !important;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.05);
 }
 .navbar-brand { font-weight: 800; letter-spacing: .3px; }
 .pill { border:1px solid rgba(255,255,255,0.25); border-radius: 20px; padding: 4px 10px; font-size: .9rem; }
@@ -87,8 +88,8 @@ code {
 .btn-outline-primary:hover { background-color: var(--primary); color: #fff; }
 .btn-outline-success { color: var(--success); border-color: var(--success); }
 .btn-outline-success:hover { background-color: var(--success); color: #fff; }
-.btn-outline-secondary { border-color: #94a3b8; color: #64748b; }
-.btn-outline-secondary:hover { background-color: #94a3b8; color: #fff; }
+.btn-outline-secondary { border-color: var(--secondary); color: var(--secondary); }
+.btn-outline-secondary:hover { background-color: var(--secondary); color: #fff; }
 
 .modal-content { border-radius: var(--radius); box-shadow: var(--shadow-lg); }
 .modal-header .modal-title { font-weight: 700; color: var(--primary-dark); }
