@@ -65,7 +65,11 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http, JwtAuthFilter jwtAuthFilter, AuditLoggingFilter auditLoggingFilter) throws Exception {
         http
-                .csrf(csrf -> csrf.csrfTokenRepository(org.springframework.security.web.csrf.CookieCsrfTokenRepository.withHttpOnlyFalse()))
+                .csrf(csrf -> csrf
+                        // Ignore CSRF for public API endpoints that are called from static pages
+                        .ignoringRequestMatchers("/api/contact", "/api/visits", "/api/auth/**")
+                        .csrfTokenRepository(org.springframework.security.web.csrf.CookieCsrfTokenRepository.withHttpOnlyFalse())
+                )
                 .cors(Customizer.withDefaults())
                 .sessionManagement(sm -> sm.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .headers(h -> h
@@ -107,16 +111,18 @@ public class SecurityConfig {
         sb.append("script-src 'self' https://cdn.jsdelivr.net https://cdnjs.cloudflare.com");
         if (allowUnsafeInline) sb.append(" 'unsafe-inline'");
         sb.append("; ");
-        // Styles from self and jsDelivr; avoid unsafe-inline unless explicitly allowed for dev
-        sb.append("style-src 'self' https://cdn.jsdelivr.net");
+        // Styles from self, jsDelivr, and Google Fonts; avoid unsafe-inline unless explicitly allowed for dev
+        sb.append("style-src 'self' https://cdn.jsdelivr.net https://fonts.googleapis.com");
         if (allowUnsafeInline) sb.append(" 'unsafe-inline'");
         sb.append("; ");
-        // Fonts from self and Google Fonts only (restrictive)
-        sb.append("font-src 'self' https://fonts.gstatic.com; ");
+        // Allow external linked stylesheets explicitly (useful to separate inline vs link elements)
+        sb.append("style-src-elem 'self' https://cdn.jsdelivr.net https://fonts.googleapis.com https://cdnjs.cloudflare.com; ");
+        // Fonts from self, Google Fonts and jsDelivr (for Bootstrap Icons)
+        sb.append("font-src 'self' https://fonts.gstatic.com https://cdn.jsdelivr.net; ");
         // Images and data URIs
         sb.append("img-src 'self' data:; ");
-        // Allow XHR/fetch to same origin only
-        sb.append("connect-src 'self'; ");
+        // Allow XHR/fetch to same origin and jsDelivr (e.g., source maps)
+        sb.append("connect-src 'self' https://cdn.jsdelivr.net; ");
         // Harden other directives
         sb.append("object-src 'none'; base-uri 'self'; frame-ancestors 'none'");
         return sb.toString();
