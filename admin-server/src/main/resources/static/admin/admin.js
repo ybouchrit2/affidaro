@@ -103,7 +103,7 @@ window.selectedClientId = null;
       const tr = document.createElement('tr');
       const durSec = v.durationMs ? Math.round(v.durationMs/1000) : 0;
       tr.innerHTML = `<td>${fmtTs(v.timestamp)}</td><td><code>${v.page||'/'}</code></td><td>${(v.referrer||'').slice(0,120)}</td><td>${durSec}</td>`;
-      tr.style.cursor = 'pointer';
+      tr.classList.add('cursor-pointer');
       tr.addEventListener('click', ()=> openVisitModal(v));
       tbody.appendChild(tr);
     });
@@ -127,7 +127,7 @@ window.selectedClientId = null;
         <td>${c.contactTime||''}</td>
         <td>${c.source||''}</td>
         <td>${(c.details||'').slice(0,160)}</td>`;
-      tr.style.cursor = 'pointer';
+      tr.classList.add('cursor-pointer');
       tr.addEventListener('click', ()=> openContactModal(c));
       tbody.appendChild(tr);
     });
@@ -172,7 +172,7 @@ window.selectedClientId = null;
     pageRows.forEach(c => {
       const tr = document.createElement('tr');
       tr.innerHTML = `<td>${fmtDate(c.createdAt)}</td><td>${c.name||''}</td><td>📞 ${c.phone||''}</td><td>📧 ${c.email||''}</td><td>${c.status||''}</td><td>${c.source||''}</td>`;
-      tr.style.cursor = 'pointer';
+      tr.classList.add('cursor-pointer');
       tr.addEventListener('click', () => {
         window.selectedClientId = c.id;
         const label = document.getElementById('selectedClientLabel');
@@ -647,7 +647,7 @@ window.selectedClientId = null;
   document.getElementById('addLogBtn')?.addEventListener('click', (e)=>{ e.preventDefault(); addLog(); });
     // sortable headers for clients
     document.querySelectorAll('thead [data-sort]').forEach(th => {
-      th.style.cursor = 'pointer';
+      th.classList.add('cursor-pointer');
       th.addEventListener('click', () => {
         const key = th.getAttribute('data-sort');
         const table = th.closest('table');

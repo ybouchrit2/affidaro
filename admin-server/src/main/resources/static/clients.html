@@ -34,20 +34,20 @@
           <input id="searchInput" class="form-control" type="search" placeholder="ابحث باسم/بريد/هاتف" aria-label="Search">
         </div>
         <div class="ms-3 d-flex gap-2">
-          <select id="statusFilter" class="form-select form-select-sm" style="max-width:180px">
+          <select id="statusFilter" class="form-select form-select-sm max-w-180">
             <option value="">كل الحالات</option>
             <option value="lead">Lead</option>
             <option value="interested">Interested</option>
             <option value="active">Active</option>
             <option value="rejected">Rejected</option>
           </select>
-          <select id="classificationFilter" class="form-select form-select-sm" style="max-width:180px">
+          <select id="classificationFilter" class="form-select form-select-sm max-w-180">
             <option value="">كل التصنيفات</option>
             <option value="vip">VIP</option>
             <option value="regular">Regular</option>
             <option value="prospect">Prospect</option>
           </select>
-          <select id="pipelineFilter" class="form-select form-select-sm" style="max-width:220px">
+          <select id="pipelineFilter" class="form-select form-select-sm max-w-220">
             <option value="">كل مراحل الأنابيب</option>
             <option value="new">New</option>
             <option value="contacted">Contacted</option>
@@ -103,6 +103,7 @@
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script src="/admin/api-mock.js" defer></script>
 <script src="/admin/clients.js" defer></script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 <!-- Modal: تعديل عميل -->
