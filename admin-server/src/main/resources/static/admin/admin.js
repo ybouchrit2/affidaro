@@ -463,11 +463,11 @@ window.selectedClientId = null;
     if(agreementForm){
       agreementForm.addEventListener('submit', async (e) => {
         e.preventDefault();
-        if(!selectedClientId){ alert('Seleziona un cliente dalla lista a sinistra.'); return; }
+        if(!window.selectedClientId){ alert('Seleziona un cliente dalla lista a sinistra.'); return; }
         const signedDateVal = document.getElementById('agrSignedAt')?.value || '';
         const signedMs = signedDateVal ? new Date(signedDateVal + 'T00:00:00').getTime() : null;
         const payload = {
-          clientId: selectedClientId,
+          clientId: window.selectedClientId,
           service: document.getElementById('agrService')?.value || '',
           price: document.getElementById('agrPrice')?.value || '',
           currency: document.getElementById('agrCurrency')?.value || 'EUR',
@@ -499,10 +499,10 @@ window.selectedClientId = null;
           if(contactModal) contactModal.hide();
           await loadClients();
           if(data.id){
-            selectedClientId = data.id;
+            window.selectedClientId = data.id;
             const label = document.getElementById('selectedClientLabel');
-            const created = clients.find(c=>c.id===selectedClientId);
-            if(label) label.textContent = 'Cliente selezionato: ' + (created?.name || selectedClientId);
+            const created = clients.find(c=>c.id===window.selectedClientId);
+            if(label) label.textContent = 'Cliente selezionato: ' + (created?.name || window.selectedClientId);
             await loadAgreementsForSelected();
           }
         }catch(err){ console.warn('create-from-contact error', err.message); }
