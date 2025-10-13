@@ -13,10 +13,11 @@
   <link rel="stylesheet" href="admin.css">
   
 </head>
-<body>
+<body class="with-sidebar">
   <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
     <div class="container-fluid align-items-center">
       <a class="navbar-brand" href="#"><i class="bi bi-speedometer2 me-1"></i> Affidaro Admin</a>
+      <button class="btn btn-outline-light btn-sm d-lg-none ms-2" id="sidebarToggle"><i class="bi bi-list"></i></button>
       <div class="ms-auto d-flex align-items-center gap-3">
         <a class="btn btn-outline-light btn-sm" href="https://affidaro.com/" target="_blank"><i class="bi bi-box-arrow-up-right"></i> Vai al sito</a>
         <span id="apiPill" class="pill">API: <span id="apiBaseTxt">—</span></span>
@@ -26,8 +27,22 @@
     </div>
   </nav>
 
+  <!-- ثابت: شريط جانبي للتنقل بين الأقسام الرئيسية -->
+  <aside id="adminSidebar" class="admin-sidebar d-none d-lg-block">
+    <div class="sidebar-header">
+      <i class="bi bi-grid-1x2"></i> Navigation
+    </div>
+    <nav class="sidebar-nav">
+      <a href="#dashboardSection" class="active"><i class="bi bi-speedometer2"></i> Dashboard</a>
+      <a href="#customersSection"><i class="bi bi-people"></i> Customers</a>
+      <a href="#contractsSection"><i class="bi bi-file-earmark-text"></i> Contracts</a>
+      <a href="#visitsSection"><i class="bi bi-clock-history"></i> Visits</a>
+      <a href="#logsSection"><i class="bi bi-chat-dots"></i> Logs</a>
+    </nav>
+  </aside>
 
-  <main class="container-xl my-4">
+
+  <main id="dashboardSection" class="container-xl my-4">
     <div class="row g-3 mb-3">
       <div class="col-12">
         <div class="d-flex flex-wrap gap-3 align-items-center">
@@ -109,7 +124,7 @@
       </div>
     </div>
 
-    <div class="row g-4 mt-1">
+    <div id="visitsSection" class="row g-4 mt-1">
       <div class="col-md-6">
         <div class="card">
           <div class="card-body">
@@ -140,7 +155,7 @@
       </div>
     </div>
 
-    <div class="card mt-4">
+    <div id="contactsSection" class="card mt-4">
       <div class="card-body">
         <div class="d-flex justify-content-between align-items-center">
           <h5 class="card-title mb-0"><i class="bi bi-people me-1"></i> Ultime richieste di contatto</h5>
@@ -169,10 +184,10 @@
   </footer>
 
   <!-- CRM/ERP: Clienti e Accordi -->
-  <main class="container-xl my-4">
+  <main id="customersSection" class="container-xl my-4">
     <div class="row g-4">
       <div class="col-md-6">
-        <div class="card">
+        <div id="contractsSection" class="card">
           <div class="card-body">
             <h5 class="card-title"><i class="bi bi-person-plus me-1"></i> Gestione clienti</h5>
             <form id="clientForm" class="row g-3">
@@ -294,7 +309,7 @@
             </div>
             <div class="row g-3 mt-2">
               <div class="col-12">
-                <h6 class="mb-2"><i class="bi bi-chat-dots me-1"></i> Registro comunicazioni</h6>
+                <h6 id="logsSection" class="mb-2"><i class="bi bi-chat-dots me-1"></i> Registro comunicazioni</h6>
                 <div class="row g-2 align-items-end">
                   <div class="col-md-3">
                     <label class="form-label">Canale</label>
@@ -441,6 +456,7 @@
   <!-- Bootstrap JS Bundle -->
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
   <script src="admin.js"></script>
+  <script src="sidebar.js"></script>
   <script src="security.js"></script>
 
   <!-- Login Modal -->
