@@ -27,6 +27,8 @@ public class Agreement {
 
     private Instant createdAt;
     private Instant signedAt;
+    private Instant startDate;
+    private Instant endDate;
 
     @Column(length = 128)
     private String service; // legacy label
@@ -68,6 +70,10 @@ public class Agreement {
     public void setCreatedAt(Instant createdAt) { this.createdAt = createdAt; }
     public Instant getSignedAt() { return signedAt; }
     public void setSignedAt(Instant signedAt) { this.signedAt = signedAt; }
+    public Instant getStartDate() { return startDate; }
+    public void setStartDate(Instant startDate) { this.startDate = startDate; }
+    public Instant getEndDate() { return endDate; }
+    public void setEndDate(Instant endDate) { this.endDate = endDate; }
     public String getService() { return service; }
     public void setService(String service) { this.service = service; }
     public BigDecimal getAgreedPrice() { return agreedPrice; }

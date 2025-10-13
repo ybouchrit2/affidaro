@@ -1,0 +1,121 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>مخطط واجهة الإدارة وعلاقات البيانات</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet" />
+    <style>
+      body{font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto; margin:0; background:#0f172a; color:#e5e7eb}
+      header{padding:20px 24px; border-bottom:1px solid #1f2937; background:#0b1220}
+      h1{margin:0; font-size:20px}
+      main{padding:24px; max-width:1200px; margin:0 auto}
+      section{margin-bottom:32px; background:#111827; border:1px solid #1f2937; border-radius:10px; padding:16px}
+      .section-title{font-weight:700; font-size:16px; margin-bottom:12px}
+      .mermaid{background:#0b1220; border:1px solid #1f2937; border-radius:10px; padding:12px}
+      .grid{display:grid; gap:16px; grid-template-columns:1fr}
+      @media(min-width:992px){ .grid{grid-template-columns:1fr 1fr} }
+      .hint{font-size:13px; color:#9ca3af}
+      a{color:#60a5fa}
+    </style>
+    <script type="module">
+      import mermaid from 'https://unpkg.com/mermaid@10/dist/mermaid.esm.min.mjs';
+      mermaid.initialize({ startOnLoad: true, theme: 'dark' });
+    </script>
+  </head>
+  <body>
+    <header>
+      <h1>مخطط واجهة الإدارة وعلاقات البيانات</h1>
+      <div class="hint">ERD + Sitemap بواجهة تفاعلية قابلة للمراجعة</div>
+    </header>
+    <main>
+      <div class="grid">
+        <section>
+          <div class="section-title">مخطط العلاقات (ERD)</div>
+          <div class="mermaid">
+erDiagram
+  CUSTOMERS ||--o{ CONTRACTS : has
+  CUSTOMERS ||--o{ VISITS : has
+  USERS ||--o{ LOGS : performs
+  CONTRACTS }o--o{ LOGS : referenced
+  VISITS }o--o{ LOGS : referenced
+
+  CUSTOMERS {
+    int id PK
+    string name
+    string email
+    string phone
+    enum status
+    datetime created_at
+    datetime updated_at
+  }
+  CONTRACTS {
+    int id PK
+    int customer_id FK
+    string service
+    decimal price
+    string currency
+    date start_date
+    date end_date
+    enum status
+  }
+  VISITS {
+    int id PK
+    int customer_id FK
+    string page
+    string referrer
+    int duration_seconds
+    datetime visited_at
+  }
+  USERS {
+    int id PK
+    string username
+    string email
+    enum role
+    datetime created_at
+    datetime updated_at
+  }
+  LOGS {
+    int id PK
+    int user_id FK
+    string action
+    string target_type
+    int target_id
+    datetime timestamp
+  }
+          </div>
+        </section>
+
+        <section>
+          <div class="section-title">مخطط التصفح (Sitemap)</div>
+          <div class="mermaid">
+flowchart LR
+  Sidebar[[Sidebar]] --> Dashboard
+  Sidebar --> Customers
+  Sidebar --> Contracts
+  Sidebar --> Visits
+  Sidebar --> Logs
+
+  Customers --> CustomerDetailsModal[(Modal: تفاصيل العميل)]
+  Customers --> CustomerContractsView[عقود العميل]
+  Customers --> CustomerVisitsView[زيارات العميل]
+
+  Contracts --> ContractEditModal[(Modal: تعديل/إغلاق/طباعة)]
+  Visits --> VisitStatsCard[إحصاءات مصغرة]
+  Logs --> LogFilterPanel[فلترة/بحث]
+          </div>
+        </section>
+      </div>
+
+      <section>
+        <div class="section-title">ملاحظات سريعة</div>
+        <ul>
+          <li>يمكن نقل هذا المخطط إلى تنفيذ React/Vue أو صفحات HTML ثابتة.</li>
+          <li>يدعم تصدير CSV/PDF من جداول العملاء والعقود والزيارات.</li>
+          <li>الألوان والخطوط متوافقة مع التصميم الداكن مع تباين واضح.</li>
+        </ul>
+        <div class="hint">انظر أيضًا: <a href="./admin-ui-architecture.md">docs/admin-ui-architecture.md</a></div>
+      </section>
+    </main>
+  </body>
+</html>

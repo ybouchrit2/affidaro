@@ -3,6 +3,7 @@ package com.aversa.admin.model;
 import jakarta.persistence.*;
 import jakarta.persistence.Index;
 import java.time.Instant;
+import com.aversa.admin.model.Client;
 
 @Entity
 @Table(indexes = {
@@ -19,6 +20,10 @@ public class VisitEntry {
     @Column(length = 1024)
     private String userAgent;
     private Long durationMs;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "client_id")
+    private Client client; // optional link to customer
 
     public VisitEntry() {}
 
@@ -53,4 +58,6 @@ public class VisitEntry {
     public void setUserAgent(String userAgent) { this.userAgent = userAgent; }
     public Long getDurationMs() { return durationMs; }
     public void setDurationMs(Long durationMs) { this.durationMs = durationMs; }
+    public Client getClient() { return client; }
+    public void setClient(Client client) { this.client = client; }
 }

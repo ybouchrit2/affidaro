@@ -10,8 +10,22 @@
       const url = typeof input === 'string' ? input : (input && input.url) || '';
       const nextInit = init || {};
       const headers = new Headers(nextInit.headers || {});
+      // Always include credentials (cookies) for same-origin requests
+      if(!nextInit.credentials){ nextInit.credentials = 'include'; }
+      // Attach auth token to API calls
       if (authToken && url.includes('/api/')) {
         headers.set('Authorization', `Bearer ${authToken}`);
+      }
+      // Attach CSRF token if available for modifying requests
+      const method = (nextInit.method || 'GET').toUpperCase();
+      if(method === 'POST' || method === 'PUT' || method === 'DELETE'){
+        try{
+          const meta = document.querySelector('meta[name="csrf-token"]');
+          const token = meta?.getAttribute('content') || (document.cookie.match(/XSRF-TOKEN=([^;]+)/)?.[1] || '');
+          if(token && !headers.has('X-XSRF-TOKEN')){
+            headers.set('X-XSRF-TOKEN', token);
+          }
+        }catch(_){}
       }
       nextInit.headers = headers;
       return originalFetch(input, nextInit);

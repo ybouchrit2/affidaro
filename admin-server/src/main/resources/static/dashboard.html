@@ -14,8 +14,8 @@
   <!-- Bootstrap Icons -->
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
 
-  <!-- Custom CSS -->
-  <link rel="stylesheet" href="/css/custom.css">
+  <!-- Custom CSS (optional) -->
+  <!-- Removed missing /css/custom.css to avoid 404 during preview -->
 </head>
 
 <body>
@@ -56,7 +56,7 @@
             <div class="card shadow-sm border-0">
               <div class="card-body text-center">
                 <h6>العملاء الإجماليون</h6>
-                <h2 class="fw-bold text-primary">124</h2>
+                <h2 class="fw-bold text-primary"><span id="totalClients">—</span></h2>
               </div>
             </div>
           </div>
@@ -64,8 +64,8 @@
           <div class="col-md-3">
             <div class="card shadow-sm border-0">
               <div class="card-body text-center">
-                <h6>العقود الجديدة</h6>
-                <h2 class="fw-bold text-success">12</h2>
+                <h6>العملاء الجدد اليوم</h6>
+                <h2 class="fw-bold text-success"><span id="newClientsToday">—</span></h2>
               </div>
             </div>
           </div>
@@ -73,8 +73,8 @@
           <div class="col-md-3">
             <div class="card shadow-sm border-0">
               <div class="card-body text-center">
-                <h6>متوسط الزيارة (د)</h6>
-                <h2 class="fw-bold text-warning">4.8</h2>
+                <h6>متوسط الزيارة (ث)</h6>
+                <h2 class="fw-bold text-warning"><span id="avgVisitDurationSec">—</span></h2>
               </div>
             </div>
           </div>
@@ -83,7 +83,7 @@
             <div class="card shadow-sm border-0">
               <div class="card-body text-center">
                 <h6>الزيارات اليوم</h6>
-                <h2 class="fw-bold text-danger">230</h2>
+                <h2 class="fw-bold text-danger"><span id="visitsToday">—</span></h2>
               </div>
             </div>
           </div>
@@ -93,7 +93,7 @@
         <div class="mt-5">
           <h5 class="mb-3 fw-bold">الزيارات الأخيرة</h5>
           <div class="table-responsive">
-            <table class="table table-hover align-middle">
+            <table class="table table-hover align-middle" id="visitsTable">
               <thead class="table-light">
                 <tr>
                   <th>الوقت</th>
@@ -102,20 +102,25 @@
                   <th>المدة (ث)</th>
                 </tr>
               </thead>
-              <tbody>
+              <tbody></tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- آخر زيارة لكل صفحة -->
+        <div class="mt-4">
+          <h5 class="mb-3 fw-bold">آخر زيارة لكل صفحة</h5>
+          <div class="table-responsive">
+            <table class="table table-sm table-hover align-middle" id="lastByPageTable">
+              <thead class="table-light">
                 <tr>
-                  <td>23:57:21</td>
-                  <td>/home</td>
-                  <td>Google</td>
-                  <td>120</td>
+                  <th>الصفحة</th>
+                  <th>الوقت</th>
+                  <th>المُحيل</th>
+                  <th>المدة (ث)</th>
                 </tr>
-                <tr>
-                  <td>23:58:10</td>
-                  <td>/services</td>
-                  <td>Direct</td>
-                  <td>60</td>
-                </tr>
-              </tbody>
+              </thead>
+              <tbody></tbody>
             </table>
           </div>
         </div>
@@ -124,6 +129,75 @@
   </div>
 
   <!-- Bootstrap JS -->
+  <script>
+    const el = id => document.getElementById(id);
+    const safe = v => v==null ? '—' : String(v);
+    const formatDate = ts => { try { const d=new Date(ts); return `${d.toLocaleDateString()} ${d.toLocaleTimeString()}` } catch(e){ return '—'; } };
+
+    function renderCards(summary){
+      el('totalClients').textContent = safe(summary.totalClients);
+      el('newClientsToday').textContent = safe(summary.newClientsToday);
+      el('visitsToday').textContent = safe(summary.visitsToday);
+      el('avgVisitDurationSec').textContent = Math.round((summary.avgVisitDuration||0)/1000);
+    }
+
+    function renderVisits(list){
+      const tbody = document.querySelector('#visitsTable tbody');
+      tbody.innerHTML = (list||[]).slice(0,10).map(v => `
+        <tr>
+          <td>${formatDate(v.timestamp)}</td>
+          <td>${safe(v.page)}</td>
+          <td>${safe(v.referrer)}</td>
+          <td>${(v.durationMs||0)/1000 | 0}</td>
+        </tr>
+      `).join('');
+    }
+
+    function renderLastByPage(list){
+      const map = new Map();
+      (list||[]).forEach(v => {
+        const key = v.page || '';
+        const prev = map.get(key);
+        const vTs = v.timestamp ? new Date(v.timestamp).getTime() : 0;
+        const pTs = prev && prev.timestamp ? new Date(prev.timestamp).getTime() : -1;
+        if (!prev || vTs > pTs) map.set(key, v);
+      });
+      const tbody = document.querySelector('#lastByPageTable tbody');
+      const rows = Array.from(map.entries()).sort((a,b)=>{
+        const ta = a[1].timestamp ? new Date(a[1].timestamp).getTime() : 0;
+        const tb = b[1].timestamp ? new Date(b[1].timestamp).getTime() : 0;
+        return tb - ta;
+      }).slice(0,10);
+      tbody.innerHTML = rows.map(([page,v]) => `
+        <tr>
+          <td>${safe(page)}</td>
+          <td>${formatDate(v.timestamp)}</td>
+          <td>${safe(v.referrer)}</td>
+          <td>${(v.durationMs||0)/1000 | 0}</td>
+        </tr>
+      `).join('');
+    }
+
+    async function load(){
+      try {
+        const [sumRes, statsRes] = await Promise.all([
+          fetch('/api/analytics'),
+          fetch('/api/visits/stats')
+        ]);
+        const summary = await sumRes.json();
+        const stats = await statsRes.json();
+        renderCards(summary);
+        renderVisits(stats.recent || []);
+        renderLastByPage(stats.recent || []);
+      } catch(e) {
+        renderCards({});
+        renderVisits([]);
+        renderLastByPage([]);
+      }
+    }
+
+    document.addEventListener('DOMContentLoaded', load);
+  </script>
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

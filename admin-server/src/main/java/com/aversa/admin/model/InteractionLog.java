@@ -39,6 +39,14 @@ public class InteractionLog {
 
     private Integer rating; // 1..5 optional
 
+    @Column(length = 128)
+    private String action; // create, update, delete, sign, cancel, etc.
+
+    @Column(length = 64)
+    private String targetType; // Contract, Customer, Visit
+
+    private Long targetId; // id of the target entity
+
     public InteractionLog() {
         this.timestamp = Instant.now();
     }
@@ -70,4 +78,10 @@ public class InteractionLog {
     public void setOutcome(String outcome) { this.outcome = outcome; }
     public Integer getRating() { return rating; }
     public void setRating(Integer rating) { this.rating = rating; }
+    public String getAction() { return action; }
+    public void setAction(String action) { this.action = action; }
+    public String getTargetType() { return targetType; }
+    public void setTargetType(String targetType) { this.targetType = targetType; }
+    public Long getTargetId() { return targetId; }
+    public void setTargetId(Long targetId) { this.targetId = targetId; }
 }

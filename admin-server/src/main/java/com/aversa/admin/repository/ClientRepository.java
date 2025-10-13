@@ -11,7 +11,8 @@ public interface ClientRepository extends JpaRepository<Client, Long> {
     List<Client> findTop50ByOrderByCreatedAtDesc();
     List<Client> findByStatusOrderByCreatedAtDesc(String status);
     List<Client> findTop20ByNameContainingIgnoreCase(String name);
-    List<Client> findByPhoneContaining(String phone);
-    Client findByEmailIgnoreCase(String email);
+    // استخدم البصمات بدل الحقول المشفّرة للمطابقة الدقيقة
+    Client findByEmailDigest(String emailDigest);
+    Client findByPhoneDigest(String phoneDigest);
     long countByCreatedAtBetween(java.time.Instant start, java.time.Instant end);
 }

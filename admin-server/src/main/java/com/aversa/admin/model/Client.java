@@ -3,11 +3,15 @@ package com.aversa.admin.model;
 import jakarta.persistence.*;
 import jakarta.persistence.Index;
 import java.time.Instant;
+import com.aversa.admin.security.EncryptStringConverter;
+import com.aversa.admin.security.DataEncryptor;
 
 @Entity
 @Table(indexes = {
         @Index(name = "idx_clients_email", columnList = "email"),
         @Index(name = "idx_clients_phone", columnList = "phone"),
+        @Index(name = "idx_clients_email_digest", columnList = "emailDigest"),
+        @Index(name = "idx_clients_phone_digest", columnList = "phoneDigest"),
         @Index(name = "idx_clients_created_at", columnList = "createdAt")
 })
 public class Client {
@@ -19,9 +23,17 @@ public class Client {
     private Instant updatedAt;
 
     private String name;
+    @Convert(converter = EncryptStringConverter.class)
     private String phone;
+    @Convert(converter = EncryptStringConverter.class)
     private String email;
     private String source;
+
+    // بصمات قابلة للبحث (HMAC-SHA256 للنسخ المُطبّعة)
+    @Column(length = 64)
+    private String emailDigest;
+    @Column(length = 64)
+    private String phoneDigest;
 
     @Column(length = 64)
     private String status; // lead, meeting, agreed, closed, rejected
@@ -44,8 +56,8 @@ public class Client {
     public Client(String name, String phone, String email, String source, String status, String notes) {
         this.createdAt = Instant.now();
         this.name = name;
-        this.phone = phone;
-        this.email = email;
+        setPhone(phone);
+        setEmail(email);
         this.source = source;
         this.status = status;
         this.notes = notes;
@@ -67,9 +79,15 @@ public class Client {
     public String getName() { return name; }
     public void setName(String name) { this.name = name; }
     public String getPhone() { return phone; }
-    public void setPhone(String phone) { this.phone = phone; }
+    public void setPhone(String phone) {
+        this.phone = phone;
+        this.phoneDigest = DataEncryptor.hmacSha256(DataEncryptor.normalizePhone(phone));
+    }
     public String getEmail() { return email; }
-    public void setEmail(String email) { this.email = email; }
+    public void setEmail(String email) {
+        this.email = email;
+        this.emailDigest = DataEncryptor.hmacSha256(DataEncryptor.normalizeEmail(email));
+    }
     public String getSource() { return source; }
     public void setSource(String source) { this.source = source; }
     public String getStatus() { return status; }

@@ -1,5 +1,9 @@
+// Expose shared state globally for modules defined outside the IIFE
+window.API = window.API_BASE || location.origin;
+window.selectedClientId = null;
+
 (() => {
-  const API = window.API_BASE || location.origin;
+  const API = window.API;
   let recentVisits = [];
   let recentContacts = [];
   let byPageMap = {};
@@ -18,7 +22,6 @@
   let visitModal, contactModal;
   // CRM state
   let clients = [];
-  let selectedClientId = null;
   let agreements = [];
   let currentContact = null;
 
@@ -137,9 +140,20 @@
     if(!tbody) return;
     tbody.innerHTML = '';
     let rows = (clients || []).slice(0);
+    // Date range filter
+    const fromMs = fmtDateInputToMs(document.getElementById('clientsFrom')?.value || '');
+    const toMs = fmtDateEndToMs(document.getElementById('clientsTo')?.value || '');
     if(clientsQuery){
       const q = clientsQuery.toLowerCase();
       rows = rows.filter(c => `${c.name||''} ${c.phone||''} ${c.email||''} ${c.source||''}`.toLowerCase().includes(q));
+    }
+    if(fromMs || toMs){
+      rows = rows.filter(c => {
+        const ts = new Date(c.createdAt).getTime();
+        if(fromMs && ts < fromMs) return false;
+        if(toMs && ts > toMs) return false;
+        return true;
+      });
     }
     rows.sort((a,b)=>{
       const k = clientsSort.key;
@@ -157,7 +171,7 @@
       tr.innerHTML = `<td>${fmtDate(c.createdAt)}</td><td>${c.name||''}</td><td>📞 ${c.phone||''}</td><td>📧 ${c.email||''}</td><td>${c.status||''}</td><td>${c.source||''}</td>`;
       tr.style.cursor = 'pointer';
       tr.addEventListener('click', () => {
-        selectedClientId = c.id;
+        window.selectedClientId = c.id;
         const label = document.getElementById('selectedClientLabel');
         if(label) label.textContent = `Cliente selezionato: ${c.name||c.id}`;
         loadSelectedClientDetails();
@@ -183,10 +197,10 @@
 
   async function loadAgreementsForSelected(){
     const tbody = document.getElementById('agreementsList');
-    if(!selectedClientId || !tbody){ agreements=[]; tbody.innerHTML=''; return; }
+    if(!window.selectedClientId || !tbody){ agreements=[]; tbody.innerHTML=''; return; }
     try{
       setLoading(true);
-      const res = await fetch(`${API}/api/clients/${selectedClientId}/agreements`, { credentials: 'include' });
+      const res = await fetch(`${API}/api/clients/${window.selectedClientId}/agreements`, { credentials: 'include' });
       if(!res.ok) throw new Error('agreements endpoint not available');
       agreements = await res.json();
       renderAgreements();
@@ -395,6 +409,12 @@
     const clientsFilter = document.getElementById('clientsFilter');
     if(clientsFilter){ clientsFilter.addEventListener('change', loadClients); }
 
+    // Clients date range filters
+    const cf = document.getElementById('clientsFrom');
+    const ct = document.getElementById('clientsTo');
+    if(cf){ cf.addEventListener('change', ()=>{ clientsPage = 1; renderClients(); }); }
+    if(ct){ ct.addEventListener('change', ()=>{ clientsPage = 1; renderClients(); }); }
+
     const clientSearchInput = document.getElementById('clientSearch');
     const clientSearchBtn = document.getElementById('clientSearchBtn');
     async function runClientSearch(){
@@ -486,6 +506,40 @@
         finally{ setLoading(false); }
       });
     }
+
+    // Export buttons
+    const exportClientsBtn = document.getElementById('exportClients');
+    if(exportClientsBtn){
+      exportClientsBtn.addEventListener('click', () => {
+        let rows = (clients || []).slice(0);
+        const fromMs = fmtDateInputToMs(document.getElementById('clientsFrom')?.value || '');
+        const toMs = fmtDateEndToMs(document.getElementById('clientsTo')?.value || '');
+        if(clientsQuery){
+          const q = clientsQuery.toLowerCase();
+          rows = rows.filter(c => `${c.name||''} ${c.phone||''} ${c.email||''} ${c.source||''}`.toLowerCase().includes(q));
+        }
+        if(fromMs || toMs){
+          rows = rows.filter(c => {
+            const ts = new Date(c.createdAt).getTime();
+            if(fromMs && ts < fromMs) return false;
+            if(toMs && ts > toMs) return false;
+            return true;
+          });
+        }
+        exportCsv('clients.csv', rows, ['createdAt','name','phone','email','status','source']);
+      });
+    }
+    const exportAgreementsBtn = document.getElementById('exportAgreements');
+    if(exportAgreementsBtn){
+      exportAgreementsBtn.addEventListener('click', () => {
+        let rows = (agreements || []).slice(0);
+        if(agreementsQuery){
+          const q = agreementsQuery.toLowerCase();
+          rows = rows.filter(a => `${a.service||''} ${a.currency||''} ${a.status||''}`.toLowerCase().includes(q));
+        }
+        exportCsv('agreements.csv', rows, ['signedAt','service','agreedPrice','currency','status']);
+      });
+    }
   }
 
   async function init(){
@@ -504,7 +558,10 @@
       autoSwitch.checked = true;
       autoSwitch.dispatchEvent(new Event('change'));
     }
-    await Promise.all([loadAnalytics(), loadStats(), loadContacts(), loadClients(), loadContracts()]);
+    const hasToken = !!localStorage.getItem('authToken');
+    const tasks = [loadStats(), loadContacts(), loadClients()];
+    if(hasToken){ tasks.push(loadAnalytics(), loadContracts()); }
+    await Promise.all(tasks);
     setLastUpdate();
   }
   if(document.readyState==='complete' || document.readyState==='interactive') init();
@@ -520,9 +577,9 @@
   }
 
   async function loadSelectedClientDetails(){
-    if(!selectedClientId) return;
+    if(!window.selectedClientId) return;
     try{
-      const res = await fetch(`${API}/api/clients/${selectedClientId}`);
+      const res = await fetch(`${API}/api/clients/${window.selectedClientId}`);
       const data = await res.json();
       if(data && data.id){
         setSelectValue('clientClassification', data.classification || 'lead');
@@ -532,29 +589,29 @@
   }
 
   async function saveClassification(){
-    if(!selectedClientId) return;
+    if(!window.selectedClientId) return;
     const val = document.getElementById('clientClassification')?.value;
     try{
-      await fetch(`${API}/api/clients/${selectedClientId}/classification`,{
+      await fetch(`${API}/api/clients/${window.selectedClientId}/classification`,{
         method:'PUT', headers:{'Content-Type':'application/json'}, body: JSON.stringify({classification: val})
       });
     }catch(e){ console.error('saveClassification error', e); }
   }
 
   async function saveStage(){
-    if(!selectedClientId) return;
+    if(!window.selectedClientId) return;
     const val = document.getElementById('clientStage')?.value;
     try{
-      await fetch(`${API}/api/clients/${selectedClientId}/stage`,{
+      await fetch(`${API}/api/clients/${window.selectedClientId}/stage`,{
         method:'PUT', headers:{'Content-Type':'application/json'}, body: JSON.stringify({pipelineStage: val})
       });
     }catch(e){ console.error('saveStage error', e); }
   }
 
   async function loadClientLogs(){
-    if(!selectedClientId) return;
+    if(!window.selectedClientId) return;
     try{
-      const res = await fetch(`${API}/api/clients/${selectedClientId}/logs`);
+      const res = await fetch(`${API}/api/clients/${window.selectedClientId}/logs`);
       const arr = await res.json();
       const tbody = document.getElementById('clientLogsList');
       if(!tbody) return;
@@ -569,12 +626,12 @@
   }
 
   async function addLog(){
-    if(!selectedClientId) return;
+    if(!window.selectedClientId) return;
     const channel = document.getElementById('logChannel')?.value || '';
     const outcome = document.getElementById('logOutcome')?.value || '';
     const notes = document.getElementById('logNotes')?.value || '';
     try{
-      await fetch(`${API}/api/clients/${selectedClientId}/logs`,{
+      await fetch(`${API}/api/clients/${window.selectedClientId}/logs`,{
         method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({channel, outcome, notes})
       });
       document.getElementById('logNotes').value = '';

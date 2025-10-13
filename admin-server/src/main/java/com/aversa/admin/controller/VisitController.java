@@ -3,6 +3,8 @@ package com.aversa.admin.controller;
 import com.aversa.admin.model.Stats;
 import com.aversa.admin.model.VisitEntry;
 import com.aversa.admin.repository.VisitEntryRepository;
+import com.aversa.admin.repository.ClientRepository;
+import com.aversa.admin.model.Client;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 
@@ -17,12 +19,14 @@ import java.util.stream.Collectors;
 public class VisitController {
 
     private final VisitEntryRepository visitRepo;
+    private final ClientRepository clientRepo;
 
-    public VisitController(VisitEntryRepository visitRepo) {
+    public VisitController(VisitEntryRepository visitRepo, ClientRepository clientRepo) {
         this.visitRepo = visitRepo;
+        this.clientRepo = clientRepo;
     }
 
-    static class VisitPayload { public String page; public String referrer; public Long durationMs; }
+    static class VisitPayload { public String page; public String referrer; public Long durationMs; public Long clientId; }
 
     @PostMapping(value = "/visits", consumes = MediaType.APPLICATION_JSON_VALUE)
     public Map<String, Object> addVisit(@RequestBody VisitPayload payload,
@@ -35,6 +39,9 @@ public class VisitController {
                 .orElse(Optional.ofNullable(refererHeader).orElse(""));
 
         VisitEntry entry = new VisitEntry(Instant.now(), payload.page, ref, ip, ua, payload.durationMs);
+        if (payload.clientId != null) {
+            clientRepo.findById(payload.clientId).ifPresent(entry::setClient);
+        }
         visitRepo.save(entry);
         return Map.of("status", "ok");
     }
@@ -59,4 +66,17 @@ public class VisitController {
     }
 
     private String safe(String s) { return s == null ? "" : s; }
+
+    @GetMapping("/visits/byClient/{id}/recent")
+    public Map<String, Object> recentByClient(@PathVariable("id") Long id) {
+        VisitEntry v = visitRepo.findTop1ByClient_IdOrderByTimestampDesc(id);
+        if (v == null) return Map.of("status", "not_found");
+        return Map.of(
+                "status", "ok",
+                "timestamp", v.getTimestamp(),
+                "page", v.getPage(),
+                "referrer", v.getReferrer(),
+                "durationMs", v.getDurationMs()
+        );
+    }
 }

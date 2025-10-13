@@ -19,4 +19,6 @@ public interface VisitEntryRepository extends JpaRepository<VisitEntry, Long> {
 
     @Query("select avg(v.durationMs) from VisitEntry v where v.durationMs is not null and v.durationMs > 0")
     Double averageDuration();
+
+    VisitEntry findTop1ByClient_IdOrderByTimestampDesc(Long clientId);
 }

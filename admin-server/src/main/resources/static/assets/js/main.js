@@ -32,6 +32,9 @@
   try {
     const visitStart = Date.now();
     let sentVisit = false;
+    function getCsrf(){
+      try{ return (document.cookie.match(/XSRF-TOKEN=([^;]+)/)?.[1] || ''); }catch(e){ return ''; }
+    }
     function sendVisit(){
       if(sentVisit) return; sentVisit = true;
       const payload = {
@@ -41,11 +44,8 @@
       };
       const url = API_BASE + '/api/visits';
       try{
-        const blob = new Blob([JSON.stringify(payload)], {type:'application/json'});
-        if(navigator.sendBeacon){ navigator.sendBeacon(url, blob); }
-        else {
-          fetch(url, {method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(payload), keepalive:true}).catch(()=>{});
-        }
+        const csrf = getCsrf();
+        fetch(url, { method:'POST', headers:{ 'Content-Type':'application/json', 'X-XSRF-TOKEN': csrf }, body: JSON.stringify(payload), keepalive:true, credentials:'include' }).catch(()=>{});
       }catch(e){ /* ignore */ }
     }
     window.addEventListener('pagehide', sendVisit);
@@ -325,8 +325,9 @@
       };
 
       try{
+        const csrf = (document.cookie.match(/XSRF-TOKEN=([^;]+)/)?.[1] || '');
         const res = await fetch(API_BASE + '/api/contact',{
-          method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(payload)
+          method:'POST', headers:{'Content-Type':'application/json','X-XSRF-TOKEN': csrf}, body: JSON.stringify(payload), credentials:'include'
         });
         if(!res.ok) throw new Error('Failed');
         const successEl = document.getElementById('successModal');
@@ -578,8 +579,9 @@ function bindContactFormIfPresent(){
     if(submitBtn){ submitBtn.disabled = true; }
 
     try{
+      const csrf = (document.cookie.match(/XSRF-TOKEN=([^;]+)/)?.[1] || '');
       const res = await fetch(API_BASE + '/api/contact',{
-        method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(payload)
+        method:'POST', headers:{'Content-Type':'application/json','X-XSRF-TOKEN': csrf}, body: JSON.stringify(payload), credentials:'include'
       });
       if(!res.ok) throw new Error('Failed');
       const successEl = document.getElementById('successModal');
@@ -662,8 +664,9 @@ if(contactForm && contactForm.dataset.bound !== '1') {
     };
 
     try{
+      const csrf = (document.cookie.match(/XSRF-TOKEN=([^;]+)/)?.[1] || '');
       const res = await fetch(API_BASE + '/api/contact',{
-        method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(payload)
+        method:'POST', headers:{'Content-Type':'application/json','X-XSRF-TOKEN': csrf}, body: JSON.stringify(payload), credentials:'include'
       });
       if(!res.ok) throw new Error('Failed');
       const successEl = document.getElementById('successModal');

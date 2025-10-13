@@ -162,10 +162,9 @@ public class ClientController {
         }
         // Try find existing client
         Client client = null;
-        if (!e.isBlank()) client = clientRepo.findByEmailIgnoreCase(e);
+        if (!e.isBlank()) client = clientRepo.findByEmailDigest(com.aversa.admin.security.DataEncryptor.hmacSha256(com.aversa.admin.security.DataEncryptor.normalizeEmail(e)));
         if (client == null && !p.isBlank()) {
-            var list = clientRepo.findByPhoneContaining(p);
-            if (!list.isEmpty()) client = list.get(0);
+            client = clientRepo.findByPhoneDigest(com.aversa.admin.security.DataEncryptor.hmacSha256(com.aversa.admin.security.DataEncryptor.normalizePhone(p)));
         }
         if (client != null) {
             return Map.of(
@@ -211,11 +210,10 @@ public class ClientController {
         // deduplicate via email first then phone
         Client existing = null;
         if(msg.getEmail() != null && !msg.getEmail().isBlank()) {
-            existing = clientRepo.findByEmailIgnoreCase(msg.getEmail().trim());
+            existing = clientRepo.findByEmailDigest(com.aversa.admin.security.DataEncryptor.hmacSha256(com.aversa.admin.security.DataEncryptor.normalizeEmail(msg.getEmail().trim())));
         }
         if(existing == null && msg.getPhone() != null && !msg.getPhone().isBlank()) {
-            var list = clientRepo.findByPhoneContaining(msg.getPhone().trim());
-            if(!list.isEmpty()) existing = list.get(0);
+            existing = clientRepo.findByPhoneDigest(com.aversa.admin.security.DataEncryptor.hmacSha256(com.aversa.admin.security.DataEncryptor.normalizePhone(msg.getPhone().trim())));
         }
         if(existing != null){
             // update basic fields if empty

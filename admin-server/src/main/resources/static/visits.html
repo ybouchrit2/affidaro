@@ -1,0 +1,246 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>الزيارات - Affidaro Admin</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/custom.css" />
+  <style>
+    body { background:#f8fafc; }
+    .card-stat { border:0; box-shadow:0 1px 3px rgba(0,0,0,.08); }
+    .table thead th { white-space:nowrap; }
+    .form-select, .form-control { direction: rtl; }
+  </style>
+</head>
+<body>
+  <div class="d-flex">
+    <aside class="sidebar bg-dark text-white p-3">
+      <h3 class="mb-4 text-center">Affidaro Admin</h3>
+      <ul class="nav flex-column">
+        <li class="nav-item mb-2"><a href="/dashboard.html" class="nav-link text-white"><i class="bi bi-speedometer2 me-2"></i> لوحة التحكم</a></li>
+        <li class="nav-item mb-2"><a href="/clients.html" class="nav-link text-white"><i class="bi bi-people me-2"></i> العملاء</a></li>
+        <li class="nav-item mb-2"><a href="/leads.html" class="nav-link text-white"><i class="bi bi-lightbulb me-2"></i> الطلبات</a></li>
+        <li class="nav-item mb-2"><a href="/contracts.html" class="nav-link text-white"><i class="bi bi-file-earmark-text me-2"></i> العقود</a></li>
+        <li class="nav-item mb-2"><a href="/analytics.html" class="nav-link text-white"><i class="bi bi-graph-up me-2"></i> التحليلات</a></li>
+        <li class="nav-item mb-2"><a href="/communications.html" class="nav-link text-white"><i class="bi bi-chat-dots me-2"></i> الاتصالات</a></li>
+        <li class="nav-item mb-2"><a href="/visits.html" class="nav-link text-primary"><i class="bi bi-eye me-2"></i> الزيارات</a></li>
+        <li class="nav-item mb-2"><a href="/logs.html" class="nav-link text-white"><i class="bi bi-clipboard-check me-2"></i> السجلات</a></li>
+      </ul>
+    </aside>
+    <main class="flex-grow-1">
+  <nav class="navbar navbar-expand bg-white shadow-sm p-3 sticky-top">
+    <div class="container-fluid">
+      <a class="navbar-brand fw-bold" href="/dashboard.html">Affidaro Admin</a>
+      <div class="d-flex gap-2">
+        <a class="btn btn-outline-secondary" href="/clients.html">العملاء</a>
+        <a class="btn btn-outline-secondary" href="/contracts.html">العقود</a>
+        <a class="btn btn-outline-secondary" href="/analytics.html">التحليلات</a>
+        <a class="btn btn-primary" href="/visits.html">الزيارات</a>
+        <a class="btn btn-outline-secondary" href="/logs.html">السجلات</a>
+      </div>
+    </div>
+  </nav>
+
+  <section class="p-4">
+    <h4 class="fw-bold mb-3">سجل زيارات العملاء</h4>
+
+    <div id="apiAlert" class="alert alert-warning d-none" role="alert">
+      تعذّر الاتصال بواجهة البرمجة الخلفية. سيتم عرض الواجهة دون بيانات.
+    </div>
+
+    <div class="card card-stat mb-3">
+      <div class="card-body">
+        <div class="row g-3 align-items-end">
+          <div class="col-md-3">
+            <label class="form-label">العميل</label>
+            <input id="filterClient" type="text" class="form-control" placeholder="اسم العميل" />
+          </div>
+          <div class="col-md-3">
+            <label class="form-label">الصفحة</label>
+            <input id="filterPage" type="text" class="form-control" placeholder="/path" />
+          </div>
+          <div class="col-md-3">
+            <label class="form-label">التاريخ</label>
+            <input id="filterDate" type="date" class="form-control" />
+          </div>
+          <div class="col-md-3 d-flex gap-2">
+            <button id="btnApply" class="btn btn-primary flex-grow-1">تطبيق الفلاتر</button>
+            <button id="btnReset" class="btn btn-outline-secondary">إعادة الضبط</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="row g-3 mb-3" id="miniStats"></div>
+
+    <div class="table-responsive">
+      <table class="table table-hover align-middle" id="visitsTable">
+        <thead class="table-light">
+          <tr>
+            <th>العميل</th>
+            <th>الصفحة</th>
+            <th>المُحيل</th>
+            <th>المدة (ث)</th>
+            <th>الوقت</th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+    </div>
+  </section>
+    </main>
+  </div>
+  <script>
+    async function viewVisit(id){
+      try{
+        if(!id){ throw new Error('missing id'); }
+        const res = await fetch(`/api/visits/${id}`);
+        if(!res.ok) throw new Error('failed');
+        const v = await res.json();
+        document.getElementById('visitDetailClient').textContent = v.clientName || (v.client && v.client.name) || '';
+        document.getElementById('visitDetailPage').textContent = v.page || '';
+        document.getElementById('visitDetailReferrer').textContent = v.referrer || '';
+        document.getElementById('visitDetailDuration').textContent = ((v.durationMs||0)/1000|0).toString();
+        document.getElementById('visitDetailTimestamp').textContent = new Date(v.timestamp).toLocaleString('ar-EG');
+        const modal = new bootstrap.Modal(document.getElementById('visitDetailsModal'));
+        modal.show();
+      }catch(e){
+        console.warn('تعذر تحميل تفاصيل الزيارة', e);
+        alert('تعذر تحميل تفاصيل الزيارة');
+      }
+    }
+  </script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  <!-- Modal: تفاصيل زيارة -->
+  <div class="modal fade" id="visitDetailsModal" tabindex="-1">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">تفاصيل الزيارة</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <div class="mb-2"><strong>العميل:</strong> <span id="visitDetailClient"></span></div>
+          <div class="mb-2"><strong>الصفحة:</strong> <span id="visitDetailPage"></span></div>
+          <div class="mb-2"><strong>المُحيل:</strong> <span id="visitDetailReferrer"></span></div>
+          <div class="mb-2"><strong>المدة (ث):</strong> <span id="visitDetailDuration"></span></div>
+          <div class="mb-2"><strong>التوقيت:</strong> <span id="visitDetailTimestamp"></span></div>
+        </div>
+        <div class="modal-footer">
+          <button class="btn btn-secondary" data-bs-dismiss="modal">إغلاق</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const state = { visits: [], filtered: [] };
+
+    function safe(v){ return v==null? '—' : String(v); }
+    function formatDate(ts){ try { const d=new Date(ts); return `${d.toLocaleDateString()} ${d.toLocaleTimeString()}` } catch(e){ return '—'; } }
+
+    async function load(){
+      try {
+        const res = await fetch('/api/visits/stats');
+        if(!res.ok) throw new Error('HTTP '+res.status);
+        const stats = await res.json();
+        state.visits = stats.recent || [];
+        document.getElementById('apiAlert').classList.add('d-none');
+      } catch(e) {
+        state.visits = [];
+        document.getElementById('apiAlert').classList.remove('d-none');
+      }
+      // Prefill filters from URL query params if provided
+      try {
+        const params = new URLSearchParams(location.search);
+        const qClient = params.get('client');
+        const qPage = params.get('page');
+        if(qClient) document.getElementById('filterClient').value = qClient;
+        if(qPage) document.getElementById('filterPage').value = qPage;
+      } catch(_) {}
+      applyFilters();
+    }
+
+    function applyFilters(){
+      const clientQ = document.getElementById('filterClient').value.trim().toLowerCase();
+      const pageQ = document.getElementById('filterPage').value.trim().toLowerCase();
+      const dateQ = document.getElementById('filterDate').value;
+      const dateOnly = dateQ ? new Date(dateQ) : null;
+      const dayStart = dateOnly ? new Date(dateOnly.getFullYear(), dateOnly.getMonth(), dateOnly.getDate()).getTime() : null;
+      const dayEnd = dateOnly ? dayStart + 24*60*60*1000 : null;
+
+      state.filtered = state.visits.filter(v => {
+        const name = (v.clientName || (v.client && v.client.name) || '').toLowerCase();
+        const page = (v.page || '').toLowerCase();
+        const ts = v.timestamp ? new Date(v.timestamp).getTime() : 0;
+        const okClient = clientQ ? name.includes(clientQ) : true;
+        const okPage = pageQ ? page.includes(pageQ) : true;
+        const okDate = dateOnly ? (ts >= dayStart && ts < dayEnd) : true;
+        return okClient && okPage && okDate;
+      });
+      renderTable();
+      renderMiniStats();
+    }
+
+    function resetFilters(){
+      document.getElementById('filterClient').value = '';
+      document.getElementById('filterPage').value = '';
+      document.getElementById('filterDate').value = '';
+      applyFilters();
+    }
+
+    function renderTable(){
+      const tbody = document.querySelector('#visitsTable tbody');
+      tbody.innerHTML = state.filtered.map(v => `
+        <tr>
+          <td>${safe(v.clientName || (v.client && v.client.name))}</td>
+          <td>${safe(v.page)}</td>
+          <td>${safe(v.referrer)}</td>
+          <td>${(v.durationMs||0)/1000 | 0}</td>
+          <td>${formatDate(v.timestamp)}</td>
+          <td>
+            <button class="btn btn-sm btn-outline-info" onclick="viewVisit('${v.id || ''}')"><i class="bi bi-info-circle"></i></button>
+          </td>
+        </tr>
+      `).join('');
+    }
+
+    function renderMiniStats(){
+      const byClient = {};
+      state.filtered.forEach(v => {
+        const key = v.clientName || (v.client && v.client.name) || 'غير معروف';
+        byClient[key] = (byClient[key] || 0) + (v.durationMs||0);
+      });
+      const items = Object.entries(byClient).sort((a,b)=>b[1]-a[1]).slice(0,6);
+      const row = document.getElementById('miniStats');
+      row.innerHTML = items.map(([name, ms]) => `
+        <div class="col-md-4">
+          <div class="card card-stat">
+            <div class="card-body">
+              <div class="d-flex justify-content-between align-items-center">
+                <div>
+                  <div class="fw-bold">${safe(name)}</div>
+                  <div class="text-muted small">إجمالي مدة الزيارات</div>
+                </div>
+                <div class="fs-5">${Math.round(ms/1000)} ث</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      document.getElementById('btnApply').addEventListener('click', applyFilters);
+      document.getElementById('btnReset').addEventListener('click', resetFilters);
+      load();
+    });
+  </script>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
