@@ -32,3 +32,10 @@ RewriteRule ^ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
 
 # Prevent directory listings
 Options -Indexes
+
+# Explicit MIME types to avoid empty/incorrect Content-Type
+<IfModule mod_mime.c>
+  AddType text/css .css
+  AddType application/javascript .js
+  AddType image/svg+xml .svg
+</IfModule>

@@ -528,7 +528,7 @@ function bindContactFormIfPresent(){
     if(!name || !email || !phone || !service || !msgBox){ return; }
 
     // Inline error helper
-    function setError(el, message){
+  function setError(el, message){
       if(!el) return;
       el.classList.toggle('is-invalid', !!message);
       el.setAttribute('aria-invalid', message ? 'true' : 'false');
@@ -569,7 +569,11 @@ function bindContactFormIfPresent(){
     };
 
     msgBox.classList.remove('is-hidden'); msgBox.className='alert alert-info'; msgBox.textContent='Invio della richiesta in corso...';
-    if(submitBtn){ submitBtn.disabled = true; }
+    if(submitBtn){
+      submitBtn.disabled = true;
+      try{ const t = submitBtn.querySelector('.btn-text'); if(t){ t.textContent = 'Invio…'; } }catch(_){ /* ignore */ }
+      submitBtn.setAttribute('aria-busy','true');
+    }
 
     try{
       const csrf = (document.cookie.match(/XSRF-TOKEN=([^;]+)/)?.[1] || '');
@@ -588,7 +592,12 @@ function bindContactFormIfPresent(){
         setError(phone, '');
         setError(service, '');
       }catch(e){}
-      msgBox.classList.add('is-hidden');
+      // Inline success fallback in case modal fails
+      try{
+        msgBox.className = 'alert alert-success';
+        msgBox.textContent = 'Grazie! La tua richiesta è stata inviata. Ti ricontattiamo entro 24 ore.';
+        setTimeout(()=>{ msgBox.classList.add('is-hidden'); }, 4000);
+      }catch(e){ msgBox.classList.add('is-hidden'); }
       } catch(err){
         const isDemo = false;
         if(isDemo){
@@ -601,11 +610,51 @@ function bindContactFormIfPresent(){
         } else {
           msgBox.className='alert alert-danger';
           msgBox.innerHTML = `Si è verificato un errore durante l’invio. <a class="alert-link" href="${buildWhatsAppLink(payload)}" target="_blank" rel="noopener">Contattaci su WhatsApp</a> oppure riprova.`;
+          // Retry helper
+          try{
+            const btn = document.createElement('button');
+            btn.type = 'button'; btn.className = 'btn btn-sm btn-outline-light ms-2'; btn.textContent = 'Riprova';
+            btn.addEventListener('click', ()=>{ form.dispatchEvent(new Event('submit', {cancelable:true})); });
+            msgBox.appendChild(btn);
+          }catch(_){}
         }
       }
-      if(submitBtn){ submitBtn.disabled = false; }
+      if(submitBtn){
+        submitBtn.disabled = false;
+        submitBtn.removeAttribute('aria-busy');
+        try{ const t = submitBtn.querySelector('.btn-text'); if(t){ t.textContent = 'Ottieni il tuo preventivo gratuito ora'; } }catch(_){ }
+      }
     });
     form.dataset.bound = '1';
+
+    // Real-time validation and persistence
+    try{
+      const persist = (key, el) => {
+        if(!el) return;
+        el.addEventListener('input', ()=>{ try{ localStorage.setItem(key, el.value.trim()); }catch(_){ } });
+        el.addEventListener('blur', ()=>{
+          const msg = (!el.checkValidity() || !el.value.trim()) ? (el.type==='email' ? 'Inserisci un’email valida.' : (el.id==='name' ? 'Il nome è obbligatorio.' : (el.id==='phone' ? 'Numero di telefono non valido.' : 'Campo obbligatorio'))) : '';
+          setError(el, msg);
+        });
+      };
+      persist('contact_name', name);
+      persist('contact_email', email);
+      persist('contact_phone', phone);
+      persist('contact_location', document.getElementById('location'));
+      // Prefill from storage
+      try{
+        const setIf = (el, key)=>{ const v = localStorage.getItem(key); if(el && v && !el.value) el.value = v; };
+        setIf(name,'contact_name'); setIf(email,'contact_email'); setIf(phone,'contact_phone'); setIf(document.getElementById('location'),'contact_location');
+      }catch(_){ }
+      // Details counter
+      const details = document.getElementById('details');
+      if(details){
+        let counter = details.closest('.form-group')?.querySelector('.form-counter');
+        if(!counter){ counter = document.createElement('small'); counter.className = 'form-counter text-muted'; details.closest('.form-group')?.appendChild(counter); }
+        const updateCounter = ()=>{ try{ counter.textContent = `${details.value.length} caratteri`; }catch(_){ } };
+        details.addEventListener('input', updateCounter); updateCounter();
+      }
+    }catch(_){ }
   }
 
 // Attempt to bind on DOM ready and after a small delay for late-loaded includes

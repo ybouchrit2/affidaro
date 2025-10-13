@@ -25,8 +25,36 @@ window.selectedClientId = null;
   let agreements = [];
   let currentContact = null;
 
+  // API status banner
+  function setApiStatus(message, type = 'warning'){
+    try{
+      const el = document.getElementById('apiStatus');
+      if(!el) return;
+      if(!message){ el.classList.add('is-hidden'); el.textContent=''; return; }
+      el.className = `alert alert-${type}`;
+      el.textContent = message;
+      el.classList.remove('is-hidden');
+    }catch(e){ /* ignore */ }
+  }
+
   function fmtTs(ts){
     try{ return new Date(ts).toLocaleString('it-IT'); }catch(e){ return ts; }
+  }
+
+  async function checkAuth(){
+    try{
+      const res = await fetch(`${API}/api/auth/me`, { credentials: 'include' });
+      if(res.ok){ return true; }
+      if(res.status === 401 || res.status === 403){
+        setApiStatus('Accesso negato. Effettua il login per vedere i dati.', 'warning');
+        return false;
+      }
+      setApiStatus('Impossibile verificare l\'autenticazione.', 'danger');
+      return false;
+    }catch(e){
+      setApiStatus('Errore di connessione durante la verifica autenticazione.', 'danger');
+      return false;
+    }
   }
   function fmtDateInputToMs(val){
     if(!val) return null;
@@ -99,6 +127,12 @@ window.selectedClientId = null;
       if(q && !(`${v.page||''} ${v.referrer||''}`.toLowerCase().includes(q))) return false;
       return true;
     });
+    if(rows.length === 0){
+      const tr = document.createElement('tr');
+      tr.innerHTML = `<td colspan="4" class="text-muted">Nessuna visita trovata. Usa i filtri sopra o riprova ad aggiornare.</td>`;
+      tbody.appendChild(tr);
+      return;
+    }
     rows.slice(0, 20).forEach(v => {
       const tr = document.createElement('tr');
       const durSec = v.durationMs ? Math.round(v.durationMs/1000) : 0;
@@ -112,7 +146,14 @@ window.selectedClientId = null;
   function renderContacts(){
     const tbody = document.getElementById('recentContacts');
     tbody.innerHTML = '';
-    (recentContacts || []).slice(0, 50).forEach(c => {
+    const rows = (recentContacts || []).slice(0, 50);
+    if(rows.length === 0){
+      const tr = document.createElement('tr');
+      tr.innerHTML = `<td colspan="12" class="text-muted">Nessuna richiesta di contatto disponibile. Assicurati di essere autenticato e che l'API sia disponibile.</td>`;
+      tbody.appendChild(tr);
+      return;
+    }
+    rows.forEach(c => {
       const tr = document.createElement('tr');
       tr.innerHTML = `
         <td>${fmtTs(c.timestamp)}</td>
@@ -169,6 +210,12 @@ window.selectedClientId = null;
     const start = (clientsPage-1)*clientsPageSize;
     const pageRows = rows.slice(start, start+clientsPageSize);
     const pageInfo = document.getElementById('clientsPageInfo'); if(pageInfo) pageInfo.textContent = `${clientsPage}/${totalPages}`;
+    if(pageRows.length === 0){
+      const tr = document.createElement('tr');
+      tr.innerHTML = `<td colspan="6" class="text-muted">Nessun cliente da mostrare. Prova a cambiare filtri o accedi.</td>`;
+      tbody.appendChild(tr);
+      return;
+    }
     pageRows.forEach(c => {
       const tr = document.createElement('tr');
       tr.innerHTML = `<td>${fmtDate(c.createdAt)}</td><td>${c.name||''}</td><td>📞 ${c.phone||''}</td><td>📧 ${c.email||''}</td><td>${c.status||''}</td><td>${c.source||''}</td>`;
@@ -191,7 +238,13 @@ window.selectedClientId = null;
       const status = document.getElementById('clientsFilter')?.value || '';
       const url = status ? `${API}/api/clients/recent?status=${encodeURIComponent(status)}` : `${API}/api/clients/recent`;
       const res = await fetch(url, { credentials: 'include' });
-      if(!res.ok) throw new Error('clients endpoint not available');
+      if(!res.ok){
+        if(res.status === 401 || res.status === 403){ setApiStatus('Accesso negato. Effettua il login per vedere i dati.', 'warning'); }
+        else { setApiStatus('Impossibile contattare il servizio. Controlla la connessione.', 'danger'); }
+        throw new Error('clients endpoint not available');
+      } else {
+        setApiStatus('', 'info');
+      }
       clients = await res.json();
       renderClients();
     }catch(e){ console.warn('clients error', e.message); clients = []; renderClients(); }
@@ -204,7 +257,11 @@ window.selectedClientId = null;
     try{
       setLoading(true);
       const res = await fetch(`${API}/api/clients/${window.selectedClientId}/agreements`, { credentials: 'include' });
-      if(!res.ok) throw new Error('agreements endpoint not available');
+      if(!res.ok){
+        if(res.status === 401 || res.status === 403){ setApiStatus('Accesso negato ai contratti. Effettua il login.', 'warning'); }
+        else { setApiStatus('Errore nel recupero dei contratti. Riprovare.', 'danger'); }
+        throw new Error('agreements endpoint not available');
+      }
       agreements = await res.json();
       renderAgreements();
     }catch(e){ console.warn('agreements error', e.message); agreements=[]; tbody.innerHTML=''; }
@@ -238,6 +295,12 @@ window.selectedClientId = null;
     agreementsPage = Math.min(agreementsPage, totalPages);
     const start=(agreementsPage-1)*agreementsPageSize;
     const pageRows = rows.slice(start, start+agreementsPageSize);
+    if(pageRows.length === 0){
+      const tr = document.createElement('tr');
+      tr.innerHTML = `<td colspan="6" class="text-muted">Nessun accordo disponibile per il cliente selezionato.</td>`;
+      tbody.appendChild(tr);
+      return;
+    }
     const pageInfo = document.getElementById('agreementsPageInfo'); if(pageInfo) pageInfo.textContent = `${agreementsPage}/${totalPages}`;
     pageRows.forEach(a => {
       const price = (a.agreedPrice ?? '') + '';
@@ -561,9 +624,8 @@ window.selectedClientId = null;
       autoSwitch.checked = true;
       autoSwitch.dispatchEvent(new Event('change'));
     }
-    const hasToken = !!localStorage.getItem('authToken');
-    const tasks = [loadStats(), loadContacts(), loadClients()];
-    if(hasToken){ tasks.push(loadAnalytics(), loadContracts()); }
+    const isAuth = await checkAuth();
+    const tasks = isAuth ? [loadStats(), loadContacts(), loadClients(), loadAnalytics(), loadContracts()] : [loadStats(), loadContacts()];
     await Promise.all(tasks);
     setLastUpdate();
   }
