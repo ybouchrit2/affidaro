@@ -120,3 +120,29 @@ code {
 .status-pending { background:#fff3cd; color:#8a6d3b; }
 .status-signed { background:#d1e7dd; color:#0f5132; }
 .status-cancelled { background:#f8d7da; color:#842029; }
+
+/* Sidebar (aside) styles */
+.with-sidebar main { margin-left: 280px; transition: margin .2s ease; }
+.admin-sidebar {
+  position: fixed;
+  top: 56px; /* navbar height */
+  left: 0;
+  width: 260px;
+  height: calc(100vh - 56px);
+  background: var(--glass);
+  backdrop-filter: blur(10px);
+  border-right: 1px solid rgba(13, 38, 77, 0.08);
+  padding: 16px;
+  box-shadow: var(--shadow);
+  z-index: 1030;
+}
+.admin-sidebar .sidebar-header { color: var(--primary-dark); font-weight: 700; }
+.admin-sidebar .nav-link { color: #0a1525; padding: 8px 10px; border-radius: 10px; }
+.admin-sidebar .nav-link i { color: var(--primary); }
+.admin-sidebar .nav-link:hover { background: rgba(30,64,175,0.08); }
+.admin-sidebar .nav-link.active { background: rgba(30,64,175,0.12); color: var(--primary-dark); }
+
+@media (max-width: 992px) {
+  .admin-sidebar { display: none; }
+  .with-sidebar main { margin-left: 0; }
+}
