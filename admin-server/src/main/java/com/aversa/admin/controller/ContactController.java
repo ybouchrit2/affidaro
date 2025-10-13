@@ -81,11 +81,16 @@ public class ContactController {
         String email = safe(p.email).trim();
         String phone = safe(p.phone).replaceAll("\\s", "").trim();
         if(!email.isEmpty()){
-            client = clientRepo.findByEmailIgnoreCase(email);
+            String emailDigest = com.aversa.admin.security.DataEncryptor.hmacSha256(
+                    com.aversa.admin.security.DataEncryptor.normalizeEmail(email)
+            );
+            client = clientRepo.findByEmailDigest(emailDigest);
         }
         if(client == null && !phone.isEmpty()){
-            var list = clientRepo.findByPhoneContaining(phone);
-            if(!list.isEmpty()) client = list.get(0);
+            String phoneDigest = com.aversa.admin.security.DataEncryptor.hmacSha256(
+                    com.aversa.admin.security.DataEncryptor.normalizePhone(phone)
+            );
+            client = clientRepo.findByPhoneDigest(phoneDigest);
         }
         if(client == null){
             client = new Client();

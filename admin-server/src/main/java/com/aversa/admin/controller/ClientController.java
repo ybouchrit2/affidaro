@@ -243,11 +243,19 @@ public class ClientController {
         if(q == null || q.isBlank()) return clientRepo.findTop50ByOrderByCreatedAtDesc();
         String s = q.trim();
         if(s.contains("@")){
-            Client c = clientRepo.findByEmailIgnoreCase(s);
+            String emailDigest = com.aversa.admin.security.DataEncryptor.hmacSha256(
+                    com.aversa.admin.security.DataEncryptor.normalizeEmail(s)
+            );
+            Client c = clientRepo.findByEmailDigest(emailDigest);
             return c!=null ? List.of(c) : List.of();
         }
         if(s.matches("[+0-9\\s-]{5,}")){
-            return clientRepo.findByPhoneContaining(s.replaceAll("\\s",""));
+            String phoneNorm = s.replaceAll("\\s","");
+            String phoneDigest = com.aversa.admin.security.DataEncryptor.hmacSha256(
+                    com.aversa.admin.security.DataEncryptor.normalizePhone(phoneNorm)
+            );
+            Client c = clientRepo.findByPhoneDigest(phoneDigest);
+            return c!=null ? List.of(c) : List.of();
         }
         return clientRepo.findTop20ByNameContainingIgnoreCase(s);
     }
