@@ -65,9 +65,20 @@ public class AgreementController {
         @Positive(message = "signedAtMs must be positive")
         public Long signedAtMs; // optional epoch millis
 
+        @Positive(message = "startDateMs must be positive")
+        public Long startDateMs; // optional epoch millis
+        @Positive(message = "endDateMs must be positive")
+        public Long endDateMs; // optional epoch millis
+
         @AssertTrue(message = "signedAtMs requires status=\"signed\"")
         public boolean isSignedConsistency(){
             return signedAtMs == null || (status != null && status.equalsIgnoreCase("signed"));
+        }
+
+        @AssertTrue(message = "endDate must be after or equal to startDate")
+        public boolean isDateRangeValid(){
+            if (startDateMs == null || endDateMs == null) return true;
+            return endDateMs >= startDateMs;
         }
     }
 
@@ -85,9 +96,20 @@ public class AgreementController {
         @Positive(message = "signedAtMs must be positive")
         public Long signedAtMs; // optional epoch millis
 
+        @Positive(message = "startDateMs must be positive")
+        public Long startDateMs; // optional epoch millis
+        @Positive(message = "endDateMs must be positive")
+        public Long endDateMs; // optional epoch millis
+
         @AssertTrue(message = "signedAtMs requires status=\"signed\"")
         public boolean isSignedConsistency(){
             return signedAtMs == null || (status != null && status.equalsIgnoreCase("signed"));
+        }
+
+        @AssertTrue(message = "endDate must be after or equal to startDate")
+        public boolean isDateRangeValid(){
+            if (startDateMs == null || endDateMs == null) return true;
+            return endDateMs >= startDateMs;
         }
     }
 
@@ -108,6 +130,8 @@ public class AgreementController {
         BigDecimal price = safeDecimal(p.price);
         Instant signedAt = p.signedAtMs != null ? Instant.ofEpochMilli(p.signedAtMs) : null;
         Agreement a = new Agreement(client, safe(p.service), price, safeCurrency(p.currency), safe(p.status), safe(p.details), signedAt);
+        if (p.startDateMs != null) a.setStartDate(Instant.ofEpochMilli(p.startDateMs));
+        if (p.endDateMs != null) a.setEndDate(Instant.ofEpochMilli(p.endDateMs));
         if (p.serviceId != null) {
             Optional<ServiceItem> os = serviceRepo.findById(p.serviceId);
             if (os.isEmpty()) throw new ResourceNotFoundException("Service not found: " + p.serviceId);
@@ -149,6 +173,8 @@ public class AgreementController {
         if (p.status != null) a.setStatus(p.status);
         if (p.details != null) a.setDetails(p.details);
         if (p.signedAtMs != null) a.setSignedAt(Instant.ofEpochMilli(p.signedAtMs));
+        if (p.startDateMs != null) a.setStartDate(Instant.ofEpochMilli(p.startDateMs));
+        if (p.endDateMs != null) a.setEndDate(Instant.ofEpochMilli(p.endDateMs));
         agreementRepo.save(a);
         // Auto actions on status update
         if ("signed".equalsIgnoreCase(a.getStatus()) || (a.getSignedAt() != null)) {
@@ -171,5 +197,28 @@ public class AgreementController {
     private BigDecimal safeDecimal(String s) {
         try { return (s == null || s.isBlank()) ? null : new BigDecimal(s.replace(",", ".")); }
         catch (Exception e) { return null; }
+    }
+
+    @GetMapping(value = "/export", produces = "text/csv")
+    public org.springframework.http.ResponseEntity<String> exportAllAsCsv() {
+        List<Agreement> list = agreementRepo.findAll();
+        StringBuilder sb = new StringBuilder();
+        sb.append("id,clientId,service,price,currency,status,signedAt\n");
+        for (Agreement a : list) {
+            Long id = a.getId();
+            Long clientId = a.getClient() != null ? a.getClient().getId() : null;
+            String service = a.getService() == null ? "" : a.getService().replace(",", " ");
+            String price = a.getAgreedPrice() == null ? "" : a.getAgreedPrice().toPlainString();
+            String currency = a.getCurrency() == null ? "" : a.getCurrency();
+            String status = a.getStatus() == null ? "" : a.getStatus();
+            String signedAt = a.getSignedAt() == null ? "" : String.valueOf(a.getSignedAt().toEpochMilli());
+            sb.append(id).append(',').append(clientId).append(',').append(service).append(',')
+              .append(price).append(',').append(currency).append(',').append(status).append(',').append(signedAt).append('\n');
+        }
+        org.springframework.http.HttpHeaders headers = new org.springframework.http.HttpHeaders();
+        headers.add("Content-Type", "text/csv; charset=utf-8");
+        headers.add("Content-Disposition", "attachment; filename=agreements-export.csv");
+        headers.add("X-Export-Count", String.valueOf(list.size()));
+        return new org.springframework.http.ResponseEntity<>(sb.toString(), headers, org.springframework.http.HttpStatus.OK);
     }
 }
