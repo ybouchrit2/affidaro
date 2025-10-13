@@ -50,14 +50,17 @@ window.selectedClientId = null;
     if(loadingCount < 0) loadingCount = 0;
     const sp = document.getElementById('loadingSpinner');
     const ut = document.getElementById('updatingText');
-    if(sp) sp.style.visibility = loadingCount > 0 ? 'visible' : 'hidden';
+    if(sp){
+      if(loadingCount > 0) sp.classList.remove('is-hidden');
+      else sp.classList.add('is-hidden');
+    }
     if(ut){
       if(loadingCount > 0){
-        ut.style.visibility = 'visible';
+        ut.classList.remove('is-hidden');
         if(updatingTextTimer){ clearTimeout(updatingTextTimer); updatingTextTimer = null; }
       } else {
         if(updatingTextTimer){ clearTimeout(updatingTextTimer); }
-        updatingTextTimer = setTimeout(()=>{ ut.style.visibility = 'hidden'; }, 2000);
+        updatingTextTimer = setTimeout(()=>{ ut.classList.add('is-hidden'); }, 2000);
       }
     }
   }

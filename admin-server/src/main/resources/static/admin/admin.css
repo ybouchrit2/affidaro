@@ -156,3 +156,5 @@ code {
 /* حالات الحالة وفق المواصفات */
 .status-active { background:#d1e7dd; color:#0f5132; }
 .status-inactive { background:#e2e3e5; color:#41464b; }
+/* Utility: CSP-safe hiding without inline styles */
+.is-hidden { display: none !important; }

@@ -17,14 +17,14 @@
     // Show spinner on manual refresh, hide on completion or after timeout
     var hideTimer = null;
     function showLoading(){
-      if(spinner) spinner.style.visibility = 'visible';
-      if(updatingText) updatingText.style.visibility = 'visible';
+      if(spinner) spinner.classList.remove('is-hidden');
+      if(updatingText) updatingText.classList.remove('is-hidden');
       if(hideTimer) clearTimeout(hideTimer);
       hideTimer = setTimeout(hideLoading, 4000);
     }
     function hideLoading(){
-      if(spinner) spinner.style.visibility = 'hidden';
-      if(updatingText) updatingText.style.visibility = 'hidden';
+      if(spinner) spinner.classList.add('is-hidden');
+      if(updatingText) updatingText.classList.add('is-hidden');
       if(hideTimer) { clearTimeout(hideTimer); hideTimer = null; }
       touchClock();
     }
