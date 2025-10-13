@@ -13,7 +13,7 @@
   <link rel="stylesheet" href="admin.css">
   
 </head>
-<body class="with-sidebar">
+<body>
   <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
     <div class="container-fluid align-items-center">
       <a class="navbar-brand" href="#"><i class="bi bi-speedometer2 me-1"></i> Affidaro Admin</a>
@@ -26,21 +26,8 @@
     </div>
   </nav>
 
-  <!-- Sidebar navigation -->
-  <aside class="admin-sidebar">
-    <div class="sidebar-header d-flex align-items-center gap-2">
-      <i class="bi bi-speedometer2"></i>
-      <strong>لوحة الإدارة</strong>
-    </div>
-    <nav class="nav flex-column mt-3">
-      <a class="nav-link" href="#dashboard"><i class="bi bi-grid-1x2 me-1"></i> لوحة المؤشرات</a>
-      <a class="nav-link" href="#visits"><i class="bi bi-clock-history me-1"></i> الزيارات</a>
-      <a class="nav-link" href="#contacts"><i class="bi bi-people me-1"></i> طلبات التواصل</a>
-      <a class="nav-link" href="#crm"><i class="bi bi-person-plus me-1"></i> العملاء والعقود</a>
-    </nav>
-  </aside>
 
-  <main id="dashboard" class="container-xl my-4">
+  <main class="container-xl my-4">
     <div class="row g-3 mb-3">
       <div class="col-12">
         <div class="d-flex flex-wrap gap-3 align-items-center">
@@ -123,7 +110,7 @@
     </div>
 
     <div class="row g-4 mt-1">
-      <div id="visits" class="col-md-6">
+      <div class="col-md-6">
         <div class="card">
           <div class="card-body">
             <h5 class="card-title"><i class="bi bi-list-ol me-1"></i> Visite per pagina</h5>
@@ -153,7 +140,7 @@
       </div>
     </div>
 
-    <div id="contacts" class="card mt-4">
+    <div class="card mt-4">
       <div class="card-body">
         <div class="d-flex justify-content-between align-items-center">
           <h5 class="card-title mb-0"><i class="bi bi-people me-1"></i> Ultime richieste di contatto</h5>
@@ -182,7 +169,7 @@
   </footer>
 
   <!-- CRM/ERP: Clienti e Accordi -->
-  <main id="crm" class="container-xl my-4">
+  <main class="container-xl my-4">
     <div class="row g-4">
       <div class="col-md-6">
         <div class="card">
