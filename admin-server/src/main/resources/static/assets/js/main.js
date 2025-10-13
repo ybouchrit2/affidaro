@@ -71,15 +71,8 @@
           
           // Show/hide items based on filter
           workItems.forEach(item => {
-            if (filterValue === 'all') {
-              item.style.display = 'block';
-            } else {
-              if (item.getAttribute('data-category') === filterValue) {
-                item.style.display = 'block';
-              } else {
-                item.style.display = 'none';
-              }
-            }
+            const shouldShow = (filterValue === 'all') || (item.getAttribute('data-category') === filterValue);
+            item.classList.toggle('is-hidden', !shouldShow);
           });
         });
       });
@@ -132,7 +125,7 @@
   // Helper: hide preloader if present
   function hidePreloader(){
     const pre = getElement('preloader');
-    if(pre) pre.style.display = 'none';
+    if(pre) pre.classList.add('is-hidden');
   }
 
   // Hide preloader earlier to avoid visible "جاري التحميل" during fast reloads
@@ -145,7 +138,7 @@
   if(backBtn){
     // Use passive event listener for better scroll performance
     window.addEventListener('scroll', ()=>{ 
-      backBtn.style.display = window.scrollY > 300 ? 'block' : 'none';
+      backBtn.classList.toggle('is-hidden', !(window.scrollY > 300));
     }, {passive: true});
     const reduceMotionPref = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     backBtn.addEventListener('click', ()=> window.scrollTo({top:0,behavior: reduceMotionPref ? 'auto' : 'smooth'}));
@@ -172,19 +165,19 @@
     // Avoid double-binding if called multiple times
     if(cbEl.dataset.initialized === '1'){
       // Respect prior acceptance state
-      if(localStorage.getItem('cookiesAccepted')) cbEl.style.display = 'none';
+      if(localStorage.getItem('cookiesAccepted')) cbEl.classList.add('is-hidden');
       return;
     }
     cbEl.dataset.initialized = '1';
     if(!localStorage.getItem('cookiesAccepted')){
-      cbEl.style.display = 'flex';
+      cbEl.classList.remove('is-hidden');
       const acceptBtn = document.getElementById('acceptCookies');
       if(acceptBtn) acceptBtn.addEventListener('click', function(){
         try{ localStorage.setItem('cookiesAccepted','1'); }catch(e){}
-        cbEl.style.display = 'none';
+        cbEl.classList.add('is-hidden');
       });
     } else {
-      cbEl.style.display = 'none';
+      cbEl.classList.add('is-hidden');
     }
   }
   // Try early in case cookie bar exists in initial DOM
@@ -293,7 +286,7 @@
       service.setAttribute('aria-invalid', invalidService ? 'true' : 'false');
 
       if(invalidName||invalidEmail||invalidPhone||invalidService){
-        msgBox.style.display='block'; msgBox.className='alert alert-danger'; msgBox.textContent='Per favore compila correttamente i campi richiesti.'; 
+        msgBox.classList.remove('is-hidden'); msgBox.className='alert alert-danger'; msgBox.textContent='Per favore compila correttamente i campi richiesti.'; 
         msgBox.focus();
         return;
       }
@@ -315,7 +308,7 @@
       };
 
       // Show loading state
-      msgBox.style.display='block'; msgBox.className='alert alert-info'; msgBox.textContent='Invio della richiesta in corso...';
+      msgBox.classList.remove('is-hidden'); msgBox.className='alert alert-info'; msgBox.textContent='Invio della richiesta in corso...';
 
       // Helper per link WhatsApp
       const buildWhatsAppLink = (data) => {
@@ -342,7 +335,7 @@
           phone.setAttribute('aria-invalid','false');
           service.setAttribute('aria-invalid','false');
         }catch(e){}
-        msgBox.style.display='none';
+        msgBox.classList.add('is-hidden');
       } catch(err){
         const isDemo = false;
         if(isDemo){
@@ -351,7 +344,7 @@
             try{ const successModal = new bootstrap.Modal(successEl); successModal.show(); }catch(e){ /* ignore */ }
           }
           this.reset();
-          msgBox.style.display='none';
+          msgBox.classList.add('is-hidden');
         } else {
           msgBox.className='alert alert-danger';
           msgBox.innerHTML = `Si è verificato un errore durante l’invio. <a class="alert-link" href="${buildWhatsAppLink(payload)}" target="_blank" rel="noopener">Contattaci su WhatsApp</a> oppure riprova.`;
@@ -555,7 +548,7 @@ function bindContactFormIfPresent(){
     setError(service, invalidService ? 'Seleziona il servizio richiesto.' : '');
 
     if(invalidName||invalidEmail||invalidPhone||invalidService){
-      msgBox.style.display='block'; msgBox.className='alert alert-danger'; msgBox.textContent='Per favore completa correttamente i campi richiesti.';
+      msgBox.classList.remove('is-hidden'); msgBox.className='alert alert-danger'; msgBox.textContent='Per favore completa correttamente i campi richiesti.';
       msgBox.focus();
       return;
     }
@@ -575,7 +568,7 @@ function bindContactFormIfPresent(){
       source: 'Anteprima gratuita - Landing page Aversa'
     };
 
-    msgBox.style.display='block'; msgBox.className='alert alert-info'; msgBox.textContent='Invio della richiesta in corso...';
+    msgBox.classList.remove('is-hidden'); msgBox.className='alert alert-info'; msgBox.textContent='Invio della richiesta in corso...';
     if(submitBtn){ submitBtn.disabled = true; }
 
     try{
@@ -595,7 +588,7 @@ function bindContactFormIfPresent(){
         setError(phone, '');
         setError(service, '');
       }catch(e){}
-      msgBox.style.display='none';
+      msgBox.classList.add('is-hidden');
       } catch(err){
         const isDemo = false;
         if(isDemo){
@@ -604,7 +597,7 @@ function bindContactFormIfPresent(){
             try{ const successModal = new bootstrap.Modal(successEl); successModal.show(); }catch(e){}
           }
           form.reset();
-          msgBox.style.display='none';
+          msgBox.classList.add('is-hidden');
         } else {
           msgBox.className='alert alert-danger';
           msgBox.innerHTML = `Si è verificato un errore durante l’invio. <a class="alert-link" href="${buildWhatsAppLink(payload)}" target="_blank" rel="noopener">Contattaci su WhatsApp</a> oppure riprova.`;
@@ -633,7 +626,7 @@ if(contactForm && contactForm.dataset.bound !== '1') {
     // simple validation
     if(websiteHoneypot && websiteHoneypot.value.trim() !== '') { /* spam */ return; }
     if(!name.value.trim()||!email.checkValidity()||!phone.checkValidity()||!service.value){
-      msgBox.style.display='block'; msgBox.className='alert alert-danger'; msgBox.textContent='Per favore compila correttamente i campi richiesti.'; 
+      msgBox.classList.remove('is-hidden'); msgBox.className='alert alert-danger'; msgBox.textContent='Per favore compila correttamente i campi richiesti.'; 
       msgBox.focus();
       return;
     }
@@ -654,7 +647,7 @@ if(contactForm && contactForm.dataset.bound !== '1') {
     };
 
     // Show loading state
-    msgBox.style.display='block'; msgBox.className='alert alert-info'; msgBox.textContent='Invio della richiesta in corso...';
+    msgBox.classList.remove('is-hidden'); msgBox.className='alert alert-info'; msgBox.textContent='Invio della richiesta in corso...';
 
     // Helper per link WhatsApp
     const buildWhatsAppLink = (data) => {
@@ -674,7 +667,7 @@ if(contactForm && contactForm.dataset.bound !== '1') {
         try{ const successModal = new bootstrap.Modal(successEl); successModal.show(); }catch(e){}
       }
       this.reset();
-      msgBox.style.display='none';
+      msgBox.classList.add('is-hidden');
     } catch(err){
       msgBox.className='alert alert-danger';
       msgBox.innerHTML = `Si è verificato un errore durante l’invio. <a class="alert-link" href="${buildWhatsAppLink(payload)}" target="_blank" rel="noopener">Contattaci su WhatsApp</a> oppure riprova.`;

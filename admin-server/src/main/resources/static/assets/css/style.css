@@ -50,6 +50,9 @@ body {
   padding-right: clamp(16px, 3.5vw, 28px);
 }
 
+/* Utility: hide elements without using inline styles (CSP-safe) */
+.is-hidden { display: none !important; }
+
 #preloader {
   position: fixed;
   inset: 0;

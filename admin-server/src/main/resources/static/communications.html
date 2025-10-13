@@ -41,7 +41,7 @@
         <ul class="list-group" id="clientResults"></ul>
       </div>
 
-      <div id="logsSection" style="display:none;">
+      <div id="logsSection" class="is-hidden">
         <div class="d-flex justify-content-between align-items-center mb-3">
           <h4 class="fw-bold">سجلات الاتصالات</h4>
           <span id="selectedClient" class="text-muted"></span>
@@ -97,7 +97,7 @@ async function searchClients(){
 function selectClient(id, name){
   selectedId = id;
   document.getElementById('selectedClient').textContent = `العميل: ${name} (#${id})`;
-  document.getElementById('logsSection').style.display = '';
+  document.getElementById('logsSection').classList.remove('is-hidden');
   document.getElementById('refreshBtn').disabled = false;
   loadLogs();
 }

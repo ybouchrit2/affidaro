@@ -117,8 +117,8 @@ public class SecurityConfig {
         sb.append("; ");
         // Allow external linked stylesheets explicitly (useful to separate inline vs link elements)
         sb.append("style-src-elem 'self' https://cdn.jsdelivr.net https://fonts.googleapis.com https://cdnjs.cloudflare.com; ");
-        // Fonts from self, Google Fonts and jsDelivr (for Bootstrap Icons)
-        sb.append("font-src 'self' https://fonts.gstatic.com https://cdn.jsdelivr.net; ");
+        // Fonts from self, Google Fonts, jsDelivr (Bootstrap Icons) and cdnjs (Font Awesome)
+        sb.append("font-src 'self' https://fonts.gstatic.com https://cdn.jsdelivr.net https://cdnjs.cloudflare.com; ");
         // Images and data URIs
         sb.append("img-src 'self' data:; ");
         // Allow XHR/fetch to same origin and jsDelivr (e.g., source maps)
